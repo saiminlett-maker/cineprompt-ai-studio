@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CinePrompt AI Studio - Professional AI Cinema & Screenplay Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen p-3 md:p-6 custom-scrollbar">
+
+  <div class="max-w-[1540px] w-full mx-auto">
+    
+    <!-- Top Bar with Single-Action Tabs & Contextual Controls -->
+    <!-- Top Navigation / Status Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/80 p-3 px-4.5 rounded-2xl border border-slate-800/90 backdrop-blur-xl shadow-lg">
+      
+      <!-- Left Side: Brand Mini Tag -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/30 text-white font-black text-sm shrink-0">
+          
+        </div>
+        <div>
+          <div class="font-extrabold text-xs text-slate-200 leading-tight flex items-center gap-1.5 font-mono">
+            <span>CINEPROMPT AI</span>
+            <span id="topBrandBadge" class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-700/60 font-mono font-bold">STUDIO PRO</span>
+          </div>
+          <div id="topBrandSubtitle" class="text-[9px] text-slate-400 font-mono tracking-wide">Enterprise Cinema Suite</div>
+        </div>
+      </div>
+
+      <!-- SUPER ADMIN TOP BAR TABS (Shown strictly when Super Admin is logged in) -->
+      <div id="topAdminBarTabs" class="hidden flex-1 max-w-3xl mx-auto flex items-center justify-center gap-2 text-xs font-bold mm-text">
+        <button type="button" onclick="switchAdminTab('dashboard')" id="topAdminTab-dashboard" class="px-3.5 py-1.5 rounded-xl bg-purple-600 text-white shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
+          <span>📊</span>
+          <span>Dashboard</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('users')" id="topAdminTab-users" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer">
+          <span>👥</span>
+          <span>User အကောင့် & OTP</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('accounting')" id="topAdminTab-accounting" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer">
+          <span>💰</span>
+          <span>ငွေစာရင်း & ဝင်ငွေ</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('notifications')" id="topAdminTab-notifications" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer relative" title="အသိပေးချက် & User ဝင်ရောက်မှု မှတ်တမ်း">
+          <span id="adminNotiBellIcon">🔔</span>
+          <span>အသိပေးချက်</span>
+          <span id="adminNotiBadge" class="hidden px-1.5 py-0.2 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold animate-pulse">0</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('settings')" id="topAdminTab-settings" class="px-3.5 py-1.5 rounded-xl text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer">
+          <span>⚙️</span>
+          <span>နှုန်းထား & ဆက်တင်</span>
+        </button>
+      </div>
+
+      <!-- USER TOP BAR ACTIONS (Shown for Regular Users / VIP Testers / Guests) -->
+      <div id="topUserBarActions" class="flex flex-wrap items-center gap-2">
+        <!-- User Profile / Login Button -->
+        <button onclick="openLoginModal()" id="userProfileBtn" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 text-xs font-semibold cursor-pointer transition-all shadow-sm">
+          <span id="userAvatar" class="text-base">👤</span>
+          <span id="userNameDisplay" class="text-indigo-300 font-bold">Login ဝင်ရန်</span>
+          <span id="userStatusTag" class="text-[9px] text-amber-300 bg-amber-950/80 px-1.5 py-0.5 rounded border border-amber-800/60 font-semibold">Guest (အစမ်းသုံး)</span>
+        </button>
+
+        <!-- Subscription / Upgrade Button -->
+        <button onclick="openSubscriptionModal()" id="navSubscriptionBtn" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 hover:to-amber-600/40 text-amber-300 border border-amber-500/50 font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm hover:scale-105 cursor-pointer mm-text" title="လစဉ်ကြေး ပေးသွင်းရန် / သက်တမ်းတိုးရန်">
+          <span class="animate-pulse">💎</span>
+          <span>လစဉ်ကြေး (Member)</span>
+        </button>
+
+        <!-- Groups / Team Collaboration Button -->
+        <button onclick="openGroupStudioModal()" id="navGroupStudioBtn" class="px-3.5 py-1.5 rounded-xl bg-purple-950/70 hover:bg-purple-900/80 text-purple-300 border border-purple-700/50 font-semibold text-xs transition-all flex items-center gap-1.5 shadow-sm cursor-pointer mm-text" title="အဖွဲ့လိုက် စတူဒီယိုနှင့် မှတ်တမ်းများ">
+          <span>👥 Groups</span>
+          <span id="topGroupCountBadge" class="bg-purple-600 text-white px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold">0</span>
+        </button>
+
+        <!-- History / Saved Projects Button -->
+        <button onclick="openHistoryModal()" class="px-3.5 py-1.5 rounded-xl bg-indigo-950/70 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-700/50 font-semibold text-xs transition-all flex items-center gap-2 shadow-sm cursor-pointer">
+          <span>📜 History</span>
+          <span id="historyCountBadge" class="bg-indigo-600 text-white px-1.5 py-0.2 rounded-full text-[10px] font-bold">0</span>
+        </button>
+
+        <!-- Gemini API Settings Button -->
+        <button onclick="openSettingsModal()" class="px-3 py-1.5 rounded-xl bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 border border-slate-700/60 font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer" title="Gemini API Key ဆက်တင်">
+          <span>⚙️ Gemini API</span>
+        </button>
+
+        <!-- Help Guide Button -->
+        <button onclick="openHelpModal()" class="px-3 py-1.5 rounded-xl bg-slate-800/70 hover:bg-slate-700/70 text-slate-300 border border-slate-700/60 font-semibold text-xs transition-all flex items-center gap-1.5 cursor-pointer">
+          <span>❓ Help</span>
+        </button>
+      </div>
+
+      <!-- Right Side Shared: Direct Logout Button -->
+      <div class="flex items-center gap-2">
+        <button onclick="logoutUser()" id="topLogoutBtn" class="px-3.5 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-700/70 text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-sm mm-text" title="အကောင့်မှ ထွက်ရန် / အကောင့်ပြောင်းရန်">
+          <span>🚪</span>
+          <span>Logout (ထွက်မည်)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- USER STUDIO VIEW CONTAINER (Hidden when Super Admin logs in) -->
+    <div id="userStudioView" class="space-y-6">
+      
+      <!-- Free Trial Notification Banner (For Guests) -->
+      <div id="trialBanner" class="max-w-3xl mx-auto mb-6 p-2.5 px-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-wrap items-center justify-between gap-2 shadow-lg animate-fade-in">
+      <div class="flex items-center gap-2">
+        <span class="text-base animate-bounce"></span>
+        <span id="trialBannerText">
+          <strong>အခမဲ့ အစမ်းသုံးခွင့် (၁) ကြိမ်</strong> ရရှိထားပါသည်။ စိတ်ကြိုက် Prompt (၁) ခု အစမ်းထုတ်ယူကြည့်နိုင်ပါသည်။
+        </span>
+      </div>
+      <button onclick="openLoginModal()" class="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-sm">
+         Gmail ဖြင့် Login ဝင်မည်
+      </button>
+    </div>
+
+    <!-- Main Hero Header -->
+    <header class="text-center mb-8 space-y-3">
+      <div class="inline-flex items-center gap-2 px-4 py-1.2 rounded-full bg-gradient-to-r from-indigo-950/80 via-purple-950/80 to-indigo-950/80 border border-indigo-500/50 text-indigo-200 text-xs font-bold shadow-lg shimmer-badge font-mono tracking-wider">
+        <span></span>
+        <span>ENTERPRISE AI CINEMA & SCREENPLAY SUITE</span>
+      </div>
+      
+      <h1 class="text-3xl md:text-5xl lg:text-6xl font-black tracking-tight flex items-center justify-center gap-3">
+        <span class="gradient-title">CinePrompt AI Studio</span>
+      </h1>
+      
+      <div class="max-w-3xl mx-auto space-y-1.5">
+        <p class="text-slate-200 font-semibold text-sm md:text-base leading-relaxed mm-text">
+          ရုပ်ရှင်အဆင့်မီ AI Video နှင့် ဇာတ်လမ်းတွဲများ ဖန်တီးရန် Professional Cinema Prompts & Screenplay Studio
+        </p>
+        <p class="text-indigo-300/80 text-xs tracking-wider font-mono">
+          Cinematic Prompt Architecture  Camera Motion Direction  Multi-Character Consistency  AI Voiceover
+        </p>
+      </div>
+    </header>
+
+    <!-- ======================================================== -->
+    <!-- ️ STUDIO PIPELINE STEPS NAVIGATOR (Tabbed Step Architecture) -->
+    <!-- ======================================================== -->
+    <div class="mb-6 space-y-3">
+      
+      <!-- Top Step Pills Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-2.5 px-4 rounded-2xl border border-slate-800/90 backdrop-blur-xl shadow-xl">
+        
+        <!-- Stepped Pipeline Tabs -->
+        <div class="flex flex-wrap items-center gap-2">
+          
+          <!-- Step 1: Input Parameters -->
+          <button type="button" onclick="switchStudioStep('input')" id="studioStepBtn-input" class="px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30 mm-text">
+            <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-mono font-bold">1</span>
+            <span>⚙️ အဆင့် (၁) - ဇာတ်လမ်း & ဆက်တင်များ (Story & Settings)</span>
+          </button>
+
+          <div class="hidden sm:flex items-center text-slate-600 font-bold">➔</div>
+
+          <!-- Step 2: Output Results -->
+          <button type="button" onclick="switchStudioStep('output')" id="studioStepBtn-output" class="px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer text-slate-400 hover:text-slate-200 bg-slate-950/60 border border-slate-800/80 mm-text">
+            <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-mono">2</span>
+            <span>✨ အဆင့် (၂) - ထုတ်လုပ်ပြီး ရလဒ်များ (Studio Results & Prompts)</span>
+            <span id="outputReadyBadge" class="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-black font-mono animate-pulse">READY</span>
+          </button>
+
+          <div class="hidden sm:flex items-center text-slate-600 font-bold">➔</div>
+
+          <!-- Step 3: Project History -->
+          <button type="button" onclick="switchStudioStep('history')" id="studioStepBtn-history" class="px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer text-slate-400 hover:text-slate-200 bg-slate-950/60 border border-slate-800/80 mm-text">
+            <span class="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-mono">3</span>
+            <span> အဆင့် (၃) - မှတ်တမ်းများ (History)</span>
+            <span id="topHistoryCountBadge" class="text-[9px] px-1.5 py-0.2 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-700/60 font-mono font-bold">0</span>
+          </button>
+
+        </div>
+
+        <!-- Right Side: Layout Switcher (Tab Mode vs Split Mode) -->
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="toggleStudioLayoutMode()" id="layoutToggleBtn" class="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border border-slate-700 mm-text shadow-sm" title="Tab Mode သို့မဟုတ် Split View ပြောင်းလဲကြည့်ရှုမည်">
+            <span id="layoutToggleIcon"></span>
+            <span id="layoutToggleText">Tab Mode (တဆင့်ချင်း)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- ️ MAIN WORKSPACE WRAPPER (Dynamic Tab / Split Mode) -->
+    <!-- ======================================================== -->
+    <div id="studioWorkspaceWrapper" class="tab-mode space-y-6">
+      
+      <!-- Panel 1: Settings Form (Step 1) -->
+      <div id="studioPanel-input" class="w-full max-w-5xl mx-auto flex flex-col animate-fade-in">
+        <div class="bg-slate-900/75 border border-slate-800/90 rounded-3xl p-4 md:p-6 shadow-2xl glow-card flex flex-col space-y-4">
+          
+          <!-- Left Header -->
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-1 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-xs font-bold">⚙️</span>
+              <h2 class="text-sm md:text-base font-bold text-slate-100 mm-text">အဆင့် (၁) - ထုတ်လုပ်မှုဆိုင်ရာ အချက်အလက်များ (Studio Parameters)</h2>
+            </div>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-800/50 text-indigo-300 font-semibold font-mono">Step 1 Controls</span>
+          </div>
+
+          <!-- Active Workspace Switcher Bar (Personal vs Group Workspace) -->
+          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-950/90 border border-slate-800 shadow-inner">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl" id="activeWorkspaceIcon">👤</span>
+              <div>
+                <div class="text-xs font-bold text-slate-100 flex flex-wrap items-center gap-2 mm-text">
+                  <span class="text-slate-400 font-semibold">လက်ရှိ Workspace:</span>
+                  <span id="activeWorkspaceName" class="text-indigo-300 font-mono font-bold bg-indigo-950/80 px-2.5 py-0.5 rounded-lg border border-indigo-700/50">👤 Personal Studio (ကိုယ်ပိုင် သီးသန့်)</span>
+                </div>
+                <div id="activeWorkspaceHint" class="text-[11px] text-slate-400 mm-text mt-0.5">
+                  ထုတ်လုပ်သော Prompts များကို သင်ကိုယ်တိုင်သာ သီးသန့် ကြည့်ရှုအသုံးပြုနိုင်ပါမည်
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <select id="workspaceSwitcherSelect" onchange="onWorkspaceSwitcherChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer mm-text">
+                <option value="personal">👤 Personal (ကိုယ်ပိုင် စတူဒီယို)</option>
+                <!-- Populated dynamically via JS -->
+              </select>
+              <button type="button" onclick="openGroupStudioModal()" class="px-3 py-1.5 rounded-xl bg-purple-950/90 hover:bg-purple-900 text-purple-300 border border-purple-700/60 text-xs font-bold transition-all cursor-pointer mm-text flex items-center gap-1 shadow-sm">
+                <span>👥 Groups</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Internal Scrollable Parameter Body -->
+          <div class="flex-1 overflow-y-auto pr-1.5 space-y-4 custom-scrollbar min-h-0">
+            
+            <!-- ======================================================== -->
+            <!-- 🎬 SECTION 01: ဇာတ်လမ်း အခြေခံ & အမျိုးအစား (Story Concept, Genre & Setting) -->
+            <!-- ======================================================== -->
+            <div class="bg-[#131b2c]/80 border border-slate-800/90 rounded-2xl p-4 space-y-3.5 shadow-sm">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-purple-950 text-purple-300 border border-purple-800/60 font-mono text-[11px] font-bold">01</span>
+                  <span class="text-xs font-bold text-slate-100 mm-text">
+                    ဇာတ်လမ်း အခြေခံ & အမျိုးအစား (Story Concept, Genre & Setting)
+                  </span>
+                </div>
+                <button type="button" onclick="setRandomIdea()" class="px-2.5 py-1 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/50 text-[11px] text-indigo-300 hover:text-indigo-200 flex items-center gap-1 transition-all mm-text cursor-pointer shadow-sm">
+                  <span>🎲 စိတ်ကူးသစ်</span>
+                </button>
+              </div>
+
+              <!-- Story Idea Input -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-300 mm-text">
+                  ဇာတ်လမ်းခေါင်းစဉ် / အကြောင်းအရာ (Story Idea / Topic) *
+                </label>
+                <input type="text" id="topicInput" onchange="onTopicInputChange()" placeholder="ဥပမာ- ရွာထဲမှာ သူငယ်ချင်းနှစ်ယောက် ရတနာသေတ္တာတွေ့ပြီး ဖြစ်ပျက်တဲ့ ဟာသ"
+                  value="တောရွာလေးထဲမှာ သူငယ်ချင်းနှစ်ယောက် ထူးဆန်းတဲ့ ရတနာသေတ္တာတွေ့ပြီး ဖြစ်ပျက်တဲ့ ဟာသ"
+                  class="w-full bg-[#1e293b]/90 border border-slate-700/90 rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all mm-text">
+                
+                <!-- 💡 Photo-Driven Story Idea Suggestions (Clickable Chips) -->
+                <div id="photoStorySuggestionsContainer" class="hidden space-y-1.5 pt-1 animate-fade-in bg-amber-950/20 border border-amber-500/30 rounded-xl p-2.5">
+                  <div class="flex items-center justify-between">
+                    <label class="text-[11px] font-bold text-amber-300 flex items-center gap-1.5 mm-text">
+                      <span class="animate-pulse">💡</span>
+                      <span>ဓါတ်ပုံပေါ်မူတည်၍ အကြံပြုထားသော ဇာတ်လမ်းများ (Click to Apply):</span>
+                    </label>
+                    <span class="text-[9px] text-amber-400/80 font-mono">Suggestions</span>
+                  </div>
+                  <div id="photoStorySuggestionsList" class="flex flex-wrap gap-1.5">
+                    <!-- Populated via JS with clickable chips -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Genre, Duration, Setting, Video Structure Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <!-- Genre -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Genre (အမျိုးအစား)</label>
+                  <select id="genre" onchange="onGenreChange()" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text cursor-pointer">
+                    <option value="Comedy (ဟာသ)" selected>😂 Comedy (ဟာသ)</option>
+                    <option value="Romance (အချစ်)">❤️ Romance (အချစ်)</option>
+                    <option value="Educational (ပညာပေး)">📚 Educational (ပညာပေး)</option>
+                    <option value="Detective (စုံထောက်)">🕵️ Detective (စုံထောက်)</option>
+                    <option value="Horror & Mystery (သည်းထိတ်ရင်ဖို/သရဲ)">👻 Horror (သရဲ/သည်းထိတ်ရင်ဖို)</option>
+                    <option value="Biography & History (အတ္ထုပ္ပတ္တိ/သမိုင်းဝင်ပုဂ္ဂိုလ်)">📜 Biography (သမိုင်း/အတ္ထုပ္ပတ္တိ)</option>
+                    <option value="Emotional Drama (ဒရာမာ/စိတ်ထိခိုက်ဖွယ်)">🎭 Drama (ဒရာမာ/ခံစားမှု)</option>
+                    <option value="Action & Adventure (စွန့်စားခန်း)">⚔️ Action (စွန့်စားခန်း)</option>
+                    <option value="Sci-Fi & Futuristic (သိပ္ပံစိတ်ကူးယဉ်)">🚀 Sci-Fi (သိပ္ပံစိတ်ကူးယဉ်)</option>
+                    <option value="Fantasy Magic (မှော်ဆန်ဆန်)">✨ Fantasy (မှော်ဆန်ဆန်)</option>
+                    <option value="Motivational / Storytelling (ဘဝသင်ခန်းစာ)">💡 Motivational (ဘဝသင်ခန်းစာ)</option>
+                  </select>
+                </div>
+
+                <!-- Duration -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Duration (ကြာချိန်)</label>
+                  <select id="duration" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="30 Seconds (Shorts / TikTok)">⏱️ 30s (Shorts - 3 Scenes)</option>
+                    <option value="1 Minute (Short Story)">⏱️ 1 Min (Short - 5 Scenes)</option>
+                    <option value="3 Minutes (Full Episode)" selected>⏱️ 3 Min (Standard - 8 Scenes)</option>
+                    <option value="5 Minutes (Extended Episode)">⏱️ 5 Min (Extended - 15 Scenes)</option>
+                    <option value="10 Minutes (Long Episode)">⏱️ 10 Min (Long - 20 Scenes)</option>
+                    <option value="15 Minutes (Epic Production)">⏱️ 15 Min (Epic - Multi-Scene)</option>
+                  </select>
+                </div>
+
+                <!-- Setting Culture -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Setting Culture (ပတ်ဝန်းကျင်)</label>
+                  <select id="settingCulture" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="Myanmar Rural Village" selected>🇲🇲 Rural (မြန်မာကျေးလက်ရွာ)</option>
+                    <option value="Myanmar Modern City (Yangon/Mandalay)">🇲🇲 City (ရန်ကုန်/မန္တလေး မြို့ပြ)</option>
+                    <option value="Ancient Bagan Era (ပုဂံခေတ် ရိုးရာ)">🏛️ Ancient Bagan (ပုဂံခေတ်ရိုးရာ)</option>
+                    <option value="Western Modern (အနောက်တိုင်း ခေတ်ပေါ်)">🌆 Western Modern (အင်္ဂလိပ်/ခေတ်ပေါ်)</option>
+                    <option value="Chinese Traditional / Modern">🇨🇳 Chinese (တရုတ်)</option>
+                    <option value="Korean Modern City">🇰🇷 Korean (ကိုရီးယား)</option>
+                    <option value="Japanese Anime Town">🌸 Japanese Town (ဂျပန်မြို့ငယ်)</option>
+                    <option value="Futuristic Cyber City 2099">🌌 Cyber City 2099 (အနာဂတ်)</option>
+                    <option value="Auto Generate (အလိုအလျောက်)">🎲 Auto Generate (အလိုအလျောက်)</option>
+                  </select>
+                </div>
+
+                <!-- Video Structure: Series vs Standalone -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">ဇာတ်လမ်းပုံစံ (Series / Single)</label>
+                  <select id="videoFormat" onchange="onVideoFormatChange()" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-100 font-medium focus:border-indigo-400 focus:outline-none mm-text cursor-pointer">
+                    <option value="Single Episode (တစ်ခန်းရပ် ဇာတ်လမ်းပြီး)" selected>🎬 Single Episode (တစ်ခန်းရပ် အပြီး)</option>
+                    <option value="Series - Episode 1 (အပိုင်း ၁ - စတင်မိတ်ဆက်)">📺 Series (အပိုင်း ၁ Pilot)</option>
+                    <option value="Series - Episode 2 (အပိုင်း ၂ - အရှိန်တက်ခြင်း)">📺 Series (အပိုင်း ၂ Conflict)</option>
+                    <option value="Series - Episode 3 (အပိုင်း ၃ - အထွတ်အထိပ်)">📺 Series (အပိုင်း ၃ Climax)</option>
+                    <option value="Series - Season Finale (နောက်ဆုံးပိုင်း ဇာတ်သိမ်း)">📺 Series (ဇာတ်သိမ်း Finale)</option>
+                    <option value="Continuous Web Series (အပိုင်းဆက် - with Cliffhanger Hook)">🔥 Series (Cliffhanger Ending)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Expand Story Option -->
+              <div class="pt-1">
+                <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-[#1e293b]/60 border border-slate-800 text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="text-amber-300 text-base">📖</span>
+                    <div>
+                      <span class="font-bold text-amber-300 mm-text">Expand Story Option:</span>
+                      <span class="text-[11px] text-slate-400 mm-text ml-1">ဇာတ်လမ်း အစအဆုံး ပြန်လည် ချဲ့ထွင်ရေးသားပေးရန် ရွေးချယ်မှု</span>
+                    </div>
+                  </div>
+                  <select id="expandStory" class="bg-[#111827] border border-amber-500/40 rounded-lg px-3 py-1 text-xs text-amber-100 font-semibold focus:border-amber-400 focus:outline-none mm-text cursor-pointer">
+                    <option value="Yes (ဇာတ်လမ်း အစအဆုံး ပြန်ရေးပေးရန်)" selected>✨ Yes (ဇာတ်လမ်း အစအဆုံး ပြန်ရေးပေးရန်)</option>
+                    <option value="No (ပေးထားသည့်အတိုင်းသာ သုံးရန်)">⚡ No (ပေးထားသည့်အတိုင်းသာ သုံးရန်)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- 👥 SECTION 02: ဇာတ်ကောင်၊ အသံ & ဘာသာစကား (Character, Voice & Audio) -->
+            <!-- ======================================================== -->
+            <div class="bg-[#131b2c]/80 border border-slate-800/90 rounded-2xl p-4 space-y-3.5 shadow-sm">
+              <!-- Section Header with Modern ON/OFF Toggle Switch -->
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-mono text-[11px] font-bold">02</span>
+                  <span class="text-xs font-bold text-slate-100 mm-text">
+                    ဇာတ်ကောင်၊ အသံ & ဘာသာစကား (Character, Voice & Audio)
+                  </span>
+                </div>
+                
+                <!-- ON / OFF Toggle Switch -->
+                <div class="flex items-center gap-2 select-none">
+                  <span class="text-[11px] font-medium text-slate-400 mm-text">ဇာတ်ကောင်သတ်မှတ်မှု:</span>
+                  <button type="button" id="charStudioToggleBtn" onclick="toggleCharacterStudioSwitch()" class="relative inline-flex h-6 w-12 items-center rounded-full transition-all focus:outline-none bg-emerald-600 cursor-pointer shadow-md hover:ring-2 hover:ring-emerald-400/50" role="switch" aria-checked="true" title="ဇာတ်ကောင် စနစ် ON / OFF ပြောင်းရန် နှိပ်ပါ">
+                    <span id="charStudioToggleThumb" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-7 shadow-sm"></span>
+                  </button>
+                  <span id="charStudioStatusBadge" onclick="toggleCharacterStudioSwitch()" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700/60 font-mono cursor-pointer hover:bg-emerald-900 transition-colors">ON (Custom)</span>
+                </div>
+              </div>
+
+              <!-- 💡 Banner shown when Studio is OFF (Pure Genre-Driven Mode) -->
+              <div id="charStudioOffNotice" class="hidden bg-indigo-950/40 border border-indigo-700/50 rounded-xl p-3 flex items-center justify-between text-xs text-indigo-200 animate-fade-in">
+                <div class="flex items-center gap-2 mm-text">
+                  <span class="text-base">🎭</span>
+                  <span><strong>Genre Mode Active:</strong> ဓါတ်ပုံမတင်ဘဲ ရွေးချယ်ထားသော Genre အလိုက် ဇာတ်လမ်း & Prompts များကို အလိုအလျောက် ထုတ်လုပ်ပေးပါမည်။</span>
+                </div>
+                <button type="button" onclick="toggleCharacterStudioSwitch(true)" class="text-[11px] px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all cursor-pointer shrink-0 mm-text shadow">
+                  + ဇာတ်ကောင်ထည့်မည် (Turn ON)
+                </button>
+              </div>
+
+              <!-- ✨ Character Creator Studio Panel (Shown when ON) -->
+              <div id="characterStudioPanel" class="bg-[#0f172a]/90 border border-emerald-500/40 rounded-xl p-3.5 space-y-3 shadow-lg animate-fade-in">
+                <!-- Studio Mode Tabs (Photo Mode vs Text / Presets Mode) -->
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900/60 pb-2">
+                  <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
+                    <button type="button" id="tabCharPhotoBtn" onclick="switchCharacterSubTab('photo')" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all mm-text cursor-pointer shadow">
+                      <span>📸 ဓါတ်ပုံတင်၍ ဖန်တီးမည်</span>
+                    </button>
+                    <button type="button" id="tabCharTextBtn" onclick="switchCharacterSubTab('text')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 font-medium text-xs flex items-center gap-1.5 transition-all mm-text cursor-pointer hover:bg-slate-800">
+                      <span>✍️ ဓါတ်ပုံမတင်ဘဲ ဖန်တီးမည် (Presets)</span>
+                    </button>
+                  </div>
+                  <button type="button" onclick="generateRandomCharacterPreset()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/30 flex items-center gap-1.5 shadow-md hover:scale-105 transition-all mm-text cursor-pointer" title="ကျပန်း ဇာတ်ကောင် တစ်ဦး အလိုအလျောက် ထုတ်ယူရန် နှိပ်ပါ">
+                    <span>🎲</span>
+                    <span>AI ကျပန်း</span>
+                  </button>
+                </div>
+
+                <!-- SUB-TAB 1: 📸 PHOTO UPLOAD & PREVIEW MODE -->
+                <div id="charSubTabPhoto" class="space-y-3">
+                  <!-- Native Accessible Hidden File Input (Multiple supported) -->
+                  <input type="file" id="imageFileInput" accept="image/*" multiple onchange="handleMultipleImageUpload(event)" class="sr-only">
+
+                  <!-- Native Label-Bound Dropzone Area (Guaranteed Click Anywhere) -->
+                  <label for="imageFileInput" id="imageDropArea" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="border-2 border-dashed border-slate-700 hover:border-indigo-400 rounded-xl p-3.5 text-center cursor-pointer transition-all bg-slate-900/40 hover:bg-indigo-950/20 group block">
+                    <div class="flex flex-col items-center justify-center gap-1.5 py-1 pointer-events-none">
+                      <div class="w-9 h-9 rounded-full bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-all shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                      </div>
+                      <p class="text-xs text-slate-200 font-medium mm-text">
+                        ဓါတ်ပုံများကို <span class="text-indigo-400 font-bold underline decoration-indigo-500 underline-offset-2">ရွေးချယ်ပါ</span> သို့မဟုတ် ဆွဲထည့်ပါ (Drag & Drop)
+                      </p>
+                      <p class="text-[10px] text-slate-400 mm-text">
+                        လူပုံ၊ ဇာတ်ကောင်ပုံ ၁ ပုံ သို့မဟုတ် အများ တင်ပြီး အမည်၊ Role နှင့် အသံ သတ်မှတ်နိုင်ပါသည်
+                      </p>
+                    </div>
+                  </label>
+
+                  <!-- Multi-Character Photo Preview Cards Container (Dynamic) -->
+                  <div id="characterPreviewGallery" class="hidden space-y-2.5">
+                    <div class="flex items-center justify-between">
+                      <span id="charCountLabel" class="text-[11px] font-bold text-emerald-300 flex items-center gap-1 mm-text">
+                        <span>👥</span>
+                        <span>တင်ထားသော ဇာတ်ကောင် ဓါတ်ပုံများ (<span id="charCountNum">0</span>)</span>
+                      </span>
+                      <div class="flex items-center gap-1.5">
+                        <label for="imageFileInput" class="text-[10px] px-2 py-1 rounded bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 border border-indigo-700/50 flex items-center gap-1 transition-all mm-text cursor-pointer">
+                          <span>+ ဓါတ်ပုံထပ်ထည့်မည်</span>
+                        </label>
+                        <button type="button" onclick="clearAllUploadedImages()" class="text-[10px] px-2 py-1 rounded bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/50 flex items-center gap-1 transition-all mm-text cursor-pointer">
+                          <span>🗑️ အားလုံးဖျက်မည်</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Dynamic Character Cards List with custom name, role & voice preview -->
+                    <div id="characterCardsList" class="space-y-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+                      <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- Vision Auto-Fill & Character Sync Actions -->
+                    <div class="pt-1.5 flex items-center gap-2">
+                      <button type="button" onclick="analyzeAllCharactersFromPhotos()" id="analyzeAllCharBtn" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-950/50 transition-all cursor-pointer mm-text">
+                        <span class="animate-pulse">✨</span>
+                        <span>ဓါတ်ပုံများမှ ဇာတ်ကောင် & ဇာတ်လမ်း စိတ်ကူး ထုတ်မည်</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SUB-TAB 2: ✍️ TEXT & PRESETS MODE (No Photo Needed) -->
+                <div id="charSubTabText" class="hidden space-y-3">
+                  <!-- Quick Presets -->
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-medium text-slate-400 mm-text">⚡ Quick Presets (အမြန်ရွေးရန်):</label>
+                    <div class="flex flex-wrap gap-1.5 text-[10px]">
+                      <button type="button" onclick="applyCharacterPreset('detective')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all mm-text cursor-pointer">🕵️‍♂️ မင်းခန့် (စုံထောက်)</button>
+                      <button type="button" onclick="applyCharacterPreset('villager')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all mm-text cursor-pointer">👴 ဖိုးထောင် (ရွာသား)</button>
+                      <button type="button" onclick="applyCharacterPreset('hero')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all mm-text cursor-pointer">⚔️ စစ်သူကြီး (Hero)</button>
+                      <button type="button" onclick="applyCharacterPreset('cyber')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all mm-text cursor-pointer">🚀 Alex (အာကာသယာဉ်မှူး)</button>
+                      <button type="button" onclick="applyCharacterPreset('lady')" class="px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all mm-text cursor-pointer">🌸 မအေးသန်း (ရိုးရာမယ်)</button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <!-- Name -->
+                    <div class="space-y-1">
+                      <label class="font-medium text-slate-300 mm-text">ဇာတ်ကောင် အမည် (Character Name)</label>
+                      <input type="text" id="customCharName" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - မင်းခန့်၊ ဖိုးထောင်၊ Alex" value="မင်းခန့်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                    </div>
+                    <!-- Role -->
+                    <div class="space-y-1">
+                      <label class="font-medium text-slate-300 mm-text">အခန်းကဏ္ဍ (Role / Archetype)</label>
+                      <input type="text" id="customCharRole" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - ပါရမီရှင် စုံထောက်၊ ရွာလူကြီး" value="ရဲရင့်သော စုံထောက်လူငယ်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                    </div>
+                    <!-- Appearance -->
+                    <div class="space-y-1">
+                      <label class="font-medium text-slate-300 mm-text">ရုပ်သွင်ပြင် / မျက်နှာ (Appearance & Face)</label>
+                      <input type="text" id="customCharAppearance" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - အသက် ၂၅ နှစ်၊ ဆံပင်ကောက်၊ မျက်မှန်တပ်" value="အသက် ၂၅ နှစ်ခန့်၊ ဆံပင်တို၊ မျက်မှန်အဝိုင်းတပ်ထားသော သွက်လက်သည့် မျက်နှာထား" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                    </div>
+                    <!-- Costume -->
+                    <div class="space-y-1">
+                      <label class="font-medium text-slate-300 mm-text">ဝတ်စုံ / အဝတ်အစား (Costume & Style)</label>
+                      <input type="text" id="customCharCostume" placeholder="ဥပမာ - အညိုရောင် လည်ရှည်ဂျာကင်၊ ပုဆိုး" value="အညိုရောင် သားရေဂျာကင်၊ မီးခိုးရောင် တီရှပ်နှင့် ဂျင်းဘောင်းဘီ" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Character Consistency & Naming Style -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <!-- Character Consistency -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Character Consistency (ဇာတ်ကောင်)</label>
+                  <select id="charConsistency" onchange="onCharConsistencyChange(); updateCharacterVoicePreviewBoard();" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="Fixed Character Seed (တသမတ်တည်း ဇာတ်ကောင်)" selected>🔒 Fixed Seed (တသမတ်တည်း)</option>
+                    <option value="Custom Persona (စိတ်ကြိုက်ဖော်ပြချက်)">✨ Custom Persona (စိတ်ကြိုက်)</option>
+                    <option value="2 Main Characters Duo (ဇာတ်ကောင် ၂ ယောက်အတွဲ)">👥 Duo Couple (၂ ယောက်အတွဲ)</option>
+                    <option value="AI Generated (ကျပန်း)">🎲 AI Random (ကျပန်းဇာတ်ကောင်)</option>
+                  </select>
+                </div>
+
+                <!-- Naming Style -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Naming Style (အမည်ပေးပုံစံ)</label>
+                  <select id="namingStyle" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="Modern (ခေတ်ဆန်ဆန်)" selected>🌟 Modern (ခေတ်ဆန် - မင်းခန့်)</option>
+                    <option value="Funny / Village (ဟာသ/ရွာ - ကိုပေါက်စ၊ ဖိုးထောင်)">😂 Village (ဟာသ - ကိုပေါက်စ)</option>
+                    <option value="Traditional Myanmar (ရိုးရာ - ဦးဘချစ်၊ မအေးသန်း)">🇲🇲 Traditional (ဦးဘချစ်)</option>
+                    <option value="Cute Nicknames (ချစ်စနိုးအမည်များ - မိုးမိုး၊ ဖိုးဖိုး)">👶 Cute Names (မိုးမိုး၊ ဖိုးဖိုး)</option>
+                    <option value="Western Names (John, Alex, Emma)">🌐 Western (John, Alex)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- 🎭 INTERACTIVE CHARACTER & VOICE PREVIEW BOARD -->
+              <div id="characterVoicePreviewBoard" class="bg-[#0f172a]/95 border border-indigo-500/40 rounded-2xl p-3.5 space-y-2.5 shadow-md">
+                <div class="flex items-center justify-between border-b border-indigo-900/60 pb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base">🎭</span>
+                    <h4 class="text-xs font-bold text-indigo-200 mm-text">Character Preview & Voice Audition (ဇာတ်ကောင် & အသံ ကြည့်ရှုစစ်ဆေးရန်)</h4>
+                  </div>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/50 font-mono font-bold">Interactive Audio & Look</span>
+                </div>
+
+                <p class="text-[11px] text-slate-400 mm-text">
+                  ဇာတ်လမ်းထဲတွင် ပါဝင်မည့် ဇာတ်ကောင် တစ်ဦးချင်းစီ၏ အမည်၊ Role နှင့် သီးသန့် အသံ (Voice) များကို စမ်းသပ်နားဆင်နိုင်ပါသည်:
+                </p>
+
+                <!-- Dynamic Character Voice Cards Grid -->
+                <div id="characterVoiceCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <!-- Populated dynamically via JS -->
+                </div>
+              </div>
+
+              <!-- Main Voice Over Persona / Audio Style / Language -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs pt-1">
+                <!-- Voice Over Persona with Audio Preview -->
+                <div class="space-y-1 sm:col-span-2 md:col-span-1 bg-[#0f172a]/90 border border-emerald-500/40 rounded-xl p-2.5">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="font-bold text-emerald-300 mm-text text-[11px] flex items-center gap-1">
+                      <span>🎙️ Main Voice Over (ဇာတ်ကြောင်းပြောသံ)</span>
+                    </label>
+                    <button type="button" onclick="previewSelectedVoice(true)" id="voicePreviewBtn" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow mm-text cursor-pointer">
+                      <span>🔊 အစမ်းနားထောင်</span>
+                    </button>
+                  </div>
+                  <select id="voiceOverPersona" class="w-full bg-[#111827]/90 border border-emerald-500/50 rounded-lg px-2.5 py-1.5 text-xs text-emerald-100 font-medium focus:border-emerald-400 focus:outline-none mm-text">
+                    <option value="Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)" selected>🎙️ Male Movie (ရုပ်ရှင်သံ)</option>
+                    <option value="Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)">🎙️ Female Sweet (ချိုသာသံ)</option>
+                    <option value="Energetic TikTok / Reels Host (လူငယ်ဆန်ဆန် သွက်လက်မြူးကြွသော အသံ)">🎙️ Energetic Host (သွက်လက်သံ)</option>
+                    <option value="Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)">🎙️ Village Uncle (ရွာအဘိုးကြီးသံ)</option>
+                    <option value="Comedic Village Auntie (ဟာသဆန်ဆန် စကားကြွယ် ရွာအဒေါ်ကြီး အသံ)">🎙️ Village Auntie (ရွာအဒေါ်ကြီးသံ)</option>
+                    <option value="Mystery & Horror Suspense Whisper (သည်းထိတ်ရင်ဖို လျှို့ဝှက်ဆန်းကြယ် တီးတိုးသံ)">🎙️ Mystery Whisper (တီးတိုးသံ)</option>
+                    <option value="Calm & Soft Documentary Narrator (အေးချမ်းငြိမ့်ညောင်းသော မှတ်တမ်းရုပ်ရှင်သံ)">🎙️ Calm Documentary (ငြိမ့်ညောင်းသံ)</option>
+                    <option value="Cute Anime Kid / Cartoon Character (ကလေးချစ်စရာ ကာတွန်းဇာတ်ကောင် အသံ)">🎙️ Cute Cartoon (ကာတွန်းသံ)</option>
+                    <option value="Professional Broadcaster / News Host (သတင်းကြေညာသူ ဆန်ဆန် တိကျသေသပ်သော အသံ)">🎙️ News Broadcaster (သတင်းသံ)</option>
+                  </select>
+                </div>
+
+                <!-- Audio Style -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Audio Style (အသံပုံစံ)</label>
+                  <select id="audioStyle" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="Character Speaking (ဇာတ်ကောင်စကားပြောမည်)" selected>🗣️ Character Speaking (ဇာတ်ကောင်စကားပြော)</option>
+                    <option value="Voice Over (နောက်ခံစကားပြော)">🎙️ Voice Over (နောက်ခံစကားပြော)</option>
+                    <option value="Gibberish (ဘာသာစကားအတိအကျမရှိ)">🍌 Gibberish (ဘာသာစကားမရှိ - Minions)</option>
+                    <option value="Silent/Action-only (အမူအရာသာ)">🤫 Silent/Action-only (အမူအရာသာ)</option>
+                    <option value="Background Music & Funny SFX Only">🎵 Music & SFX Only (တေးဂီတသက်သက်)</option>
+                    <option value="Cinematic Orchestral Epic Sound">🎻 Orchestral Epic Sound</option>
+                    <option value="Dialogue + Ambient Sound Effects">🎧 Dialogue + Ambient SFX</option>
+                  </select>
+                </div>
+
+                <!-- Language -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Language (ဘာသာစကား)</label>
+                  <select id="language" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="Myanmar" selected>🇲🇲 Myanmar (မြန်မာဘာသာ)</option>
+                    <option value="English">🇬🇧 English (အင်္ဂလိပ်)</option>
+                    <option value="Chinese (Mandarin)">🇨🇳 Chinese (တရုတ်)</option>
+                    <option value="Japanese">🇯🇵 Japanese (ဂျပန်)</option>
+                    <option value="Korean">🇰🇷 Korean (ကိုရီးယား)</option>
+                    <option value="Thai">🇹🇭 Thai (ထိုင်း)</option>
+                    <option value="Hindi">🇮🇳 Hindi (ဟိန္ဒူ)</option>
+                    <option value="None">🔇 None (ဘာသာစကားမပါ / Silent)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- 🎨 SECTION 03: ရုပ်ထွက်၊ ကင်မရာ Flow & Target AI (Visual Style & Camera Flow) -->
+            <!-- ======================================================== -->
+            <div class="bg-[#131b2c]/80 border border-slate-800/90 rounded-2xl p-4 space-y-3.5 shadow-sm">
+              <div class="border-b border-slate-800/80 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono text-[11px] font-bold">03</span>
+                  <span class="text-xs font-bold text-slate-100 mm-text">
+                    ရုပ်ထွက်၊ ကင်မရာ Flow & Target AI (Visual Style & Camera Flow)
+                  </span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                <!-- Art Style -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Art Style (ရုပ်ထွက်စတိုင်လ်)</label>
+                  <select id="artStyle" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="3D Pixar / Disney Animation" selected>🎨 3D Pixar / Disney</option>
+                    <option value="Realistic Cinematic 8K Movie">🎬 Realistic (8K ရုပ်ရှင်)</option>
+                    <option value="Stick Man (ကြိုးလူသား)">✏️ Stick Man (ကြိုးလူသား)</option>
+                    <option value="2D Vintage Cartoon">📺 2D Animation (2D ကာတွန်း)</option>
+                    <option value="Paper Cut (စက္ကူဖြတ်ညှပ်ပုံစံ)">✂️ Paper Cut (စက္ကူဖြတ်ညှပ်)</option>
+                    <option value="Anime / Manga Style (Studio Ghibli)">🌸 Anime / Ghibli</option>
+                    <option value="Cyberpunk Neon 3D">🌆 Cyberpunk Neon</option>
+                    <option value="Claymation / Stop Motion">🧸 Claymation (ရွှံ့ရုပ်)</option>
+                  </select>
+                </div>
+
+                <!-- Video Flow & Camera Transitions -->
+                <div class="space-y-1">
+                  <label class="font-medium text-cyan-300 mm-text">Cinematic Flow (ကင်မရာ Flow)</label>
+                  <select id="videoFlow" class="w-full bg-[#1e293b]/90 border border-cyan-500/40 rounded-xl px-3 py-2 text-xs text-cyan-100 font-medium focus:border-cyan-400 focus:outline-none mm-text">
+                    <option value="Seamless Continuous Motion Flow (အဆက်မပြတ် ငြိမ့်ညောင်းသော Flow)" selected>🌊 Seamless Flow (ငြိမ့်ညောင်းသံ)</option>
+                    <option value="Dynamic Match-Cut Action Flow (သွက်လက်မြန်ဆန်သော Match-Cut Flow)">⚡ Match-Cut Flow (သွက်လက်သံ)</option>
+                    <option value="Whip-Pan Speed Flow (မြန်ဆန်သော Whip-Pan လှည့်ပြောင်း Flow)">🔄 Whip-Pan Flow (လှည့်ပြောင်းသံ)</option>
+                    <option value="FPV Drone Fly-Through Flow (ဒရုန်းပျံသန်းမှု လျှောတိုက် Flow)">🎥 FPV Drone Flow (ဒရုန်းလျှောတိုက်)</option>
+                    <option value="Zoom-In & Morph Flow (ချဲ့ကားကူးပြောင်းမှု Flow)">✨ Zoom & Morph (ချဲ့ကားကူးပြောင်း)</option>
+                    <option value="Cinematic Slow-Motion Orbit Flow (နှေးကွေးငြိမ့်ညောင်း ပတ်လည် Flow)">🌌 Slow-Mo Orbit (ပတ်လည် Flow)</option>
+                  </select>
+                </div>
+
+                <!-- Aspect Ratio -->
+                <div class="space-y-1">
+                  <label class="font-medium text-slate-400 mm-text">Aspect Ratio (အရွယ်အစား)</label>
+                  <select id="aspectRatio" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                    <option value="16:9 (Landscape - YouTube / TV)" selected>🖥️ 16:9 (YouTube / TV / PC)</option>
+                    <option value="9:16 (Portrait - TikTok / Reels / Shorts)">📱 9:16 (TikTok / Reels / Shorts)</option>
+                    <option value="1:1 (Square - Feed Posts)">⏹️ 1:1 (Square - Feed Post)</option>
+                    <option value="21:9 (Cinematic Ultra-wide Movie)">🎥 21:9 (Cinematic Ultra-wide)</option>
+                  </select>
+                </div>
+
+                <!-- Target AI Tool Format -->
+                <div class="space-y-1">
+                  <label class="font-medium text-indigo-300 mm-text">Target AI Video Generator</label>
+                  <select id="targetAI" class="w-full bg-[#1e293b]/90 border border-indigo-500/60 rounded-xl px-3 py-2 text-xs text-indigo-100 font-medium focus:border-indigo-400 focus:outline-none mm-text">
+                    <option value="Google Flow / Flow Frames AI (Seamless Multi-Shot Camera Flow)" selected>🌊 Google Flow AI</option>
+                    <option value="Kling AI (1.5 / 2.0 Pro - Camera & Motion Control)">🎬 Kling AI 1.5/2.0 Pro</option>
+                    <option value="Runway Gen-3 Alpha (Bracketed Cinematic Structure)">🎥 Runway Gen-3 Alpha</option>
+                    <option value="Hailuo AI / MiniMax (Hyper-realistic Physics & Micro-expressions)">✨ Hailuo AI / MiniMax</option>
+                    <option value="OpenAI Sora (Physics Simulation & Spatial Consistency)">🔮 OpenAI Sora</option>
+                    <option value="Luma Dream Machine (Ray 2 Dynamic Transitions)">🚀 Luma Dream Machine</option>
+                    <option value="Wan 2.1 (Alibaba Open Video Model)">⚡ Wan 2.1 Alibaba</option>
+                    <option value="PixVerse V3 / Pika 2.0 (-camera -motion syntax)">🎞️ PixVerse / Pika</option>
+                    <option value="Midjourney / Flux (First-Frame Keyframe Master Still)">🖼️ Midjourney / Flux</option>
+                    <option value="Universal Video Prompt (All Tools Compatible)">🌐 Universal Video Prompt</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- ======================================================== -->
+            <!-- 📖 SECTION 04: ဇာတ်လမ်း အစအဆုံး / အပြည့်အစုံ ရေးသားခြင်း (Expand Full Story Screenplay Draft) -->
+            <!-- ======================================================== -->
+            <div class="bg-[#131b2c]/90 border-2 border-purple-500/50 rounded-2xl p-4 md:p-5 space-y-3.5 shadow-xl glow-card animate-fade-in">
+              <div class="flex items-center justify-between border-b border-purple-900/60 pb-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-purple-950 text-purple-300 border border-purple-800/60 font-mono text-[11px] font-bold">04</span>
+                  <span class="text-xs md:text-sm font-bold text-purple-200 mm-text">
+                    ဇာတ်လမ်း အစအဆုံး / အပြည့်အစုံ ရေးသားခြင်း (Expand Story Script & Screenplay Draft)
+                  </span>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/60 font-mono font-bold">Step 1 Screenplay</span>
+              </div>
+
+              <p class="text-xs text-slate-300 mm-text leading-relaxed">
+                အပေါ်တွင် သတ်မှတ်ထားသော <strong>ဇာတ်ကောင်များ (Characters)</strong>၊ <strong>အသံ (Voice & Language)</strong> နှင့် <strong>ရုပ်ထွက် (Visuals)</strong> များကို အခြေခံ၍ ဇာတ်လမ်း အစအဆုံး ဇာတ်ညွှန်းကို အရင်ဆုံး အသေးစိတ် ထုတ်ယူစစ်ဆေးနိုင်ပါသည်:
+              </p>
+
+              <!-- 📝 Expand Story Action Button -->
+              <div>
+                <button type="button" onclick="expandFullStoryDraft()" id="expandStoryBtn" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs md:text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-purple-950/60 transition-all cursor-pointer mm-text hover:scale-[1.01] active:scale-[0.99]">
+                  <span class="text-base">📖</span>
+                  <span id="expandStoryBtnText">၁။ ဇာတ်လမ်း အစအဆုံး/အပြည့်အစုံ ရေးသားမည် (Expand Story Script) 🚀</span>
+                </button>
+              </div>
+
+              <!-- Editable Story Draft Container -->
+              <div id="storyDraftContainer" class="hidden space-y-2.5 bg-[#0f172a]/95 border border-purple-500/50 rounded-2xl p-4 shadow-xl animate-fade-in">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-purple-900/60 pb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base">📝</span>
+                    <span class="text-xs font-bold text-purple-300 mm-text">ဇာတ်လမ်း ပြင်ဆင်ရန် (Edit Story Script Draft)</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="copyExpandedStoryDraft()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer mm-text">
+                      <span>📋 Copy Script</span>
+                    </button>
+                    <span class="text-[10px] text-slate-400 font-mono">Editable Screenplay</span>
+                  </div>
+                </div>
+                
+                <p class="text-[11px] text-slate-400 mm-text">
+                  ဇာတ်ကောင်စာရင်း၊ စကားပြောများနှင့် အခန်းစဉ်အလိုက် အသေးစိတ်ကို မိမိစိတ်ကြိုက် တိုက်ရိုက် ပြင်ဆင်ဖြည့်စွက်နိုင်ပါသည်:
+                </p>
+                <textarea id="expandedStoryDraft" rows="8" placeholder="ဇာတ်လမ်းအစအဆုံး ရေးသားထားသော ဇာတ်ညွှန်း ပေါ်လာပါမည်..." class="w-full bg-[#182338] border border-purple-600/50 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 custom-scrollbar font-mono leading-relaxed mm-text shadow-inner"></textarea>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Generate & Step 2 Navigation Actions -->
+          <div class="pt-4 border-t border-slate-800/90 flex flex-wrap items-center justify-between gap-3 shrink-0 mt-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="setRandomIdea()" class="px-3.5 py-2.5 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/60 text-xs text-indigo-300 font-semibold flex items-center gap-1.5 transition-all mm-text cursor-pointer shadow-sm">
+                <span>🎲 စိတ်ကူးသစ် (Random Idea)</span>
+              </button>
+              <button type="button" onclick="switchStudioStep('output')" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all mm-text cursor-pointer">
+                <span>✨ ရလဒ်များသို့ သွားမည် ➔</span>
+              </button>
+            </div>
+
+            <button onclick="generateVideoPrompts()" id="genBtn" class="flex-1 min-w-[280px] py-3.5 px-6 rounded-2xl font-black text-sm text-white gradient-btn shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]">
+              <svg class="w-5 h-5 animate-spin hidden" id="spinIcon" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span id="genBtnText" class="mm-text tracking-wide">🎬 ၂။ AI Prompts & Script စတင်ထုတ်လုပ်မည် (Generate) 🚀</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Panel 2: Generated Output (Step 2) -->
+      <div id="studioPanel-output" class="w-full max-w-6xl mx-auto flex flex-col hidden animate-fade-in">
+        <div class="bg-slate-900/75 border border-slate-800/90 rounded-3xl p-4 md:p-6 shadow-2xl glow-card flex flex-col space-y-4">
+          
+          <!-- Output Header & Tab Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-800/80 pb-3.5 mb-2 shrink-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="switchStudioStep('input')" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer mm-text shadow-sm" title="အဆင့် ၁ သို့ ပြန်သွားပြီး ဆက်တင်များ ပြင်ဆင်မည်">
+                <span> ⚙️ ဆက်တင်များ ပြန်ပြင်မည်</span>
+              </button>
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-lg bg-purple-600/30 border border-purple-500/40 text-purple-400 flex items-center justify-center text-xs font-bold">✨</span>
+                <h2 class="text-sm md:text-base font-bold text-slate-100 mm-text">ထုတ်လုပ်ပြီး ရလဒ်များ (Studio Workspace)</h2>
+              </div>
+              <button onclick="continueGeneratingScenes()" id="continueGenBtn" class="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-md shadow-purple-950/40 transition-all cursor-pointer mm-text" title="နောက်ထပ် Scene များကို ဆက်လက် ထုတ်ယူမည်">
+                <span></span>
+                <span>ဆက်လက်ထုတ်ယူမည် (Continue)</span>
+              </button>
+              <button onclick="playFullStoryVoiceover()" id="playFullVoiceBtn" class="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-md shadow-emerald-950/40 transition-all cursor-pointer mm-text">
+                <span class="animate-pulse"></span>
+                <span>Play Audio</span>
+              </button>
+            </div>
+            
+            <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs mm-text">
+              
+              <!-- Tab 1: Video ထုတ်ရန် Prompts (Recommended for direct AI video generation) -->
+              <div class="relative group">
+                <button onclick="switchTab('raw')" id="tabBtn-raw" class="px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition-all cursor-pointer">
+                  <span>✨ Video ထုတ်ရန်</span>
+                  <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 font-extrabold uppercase">⭐ Rec</span>
+                </button>
+                <div class="tab-tooltip absolute right-0 sm:left-1/2 sm:-translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-indigo-500/60 rounded-xl shadow-2xl z-50 text-[11px] text-slate-200">
+                  <div class="font-bold text-amber-300 mb-1 flex items-center gap-1.5">
+                    <span>⭐</span>
+                    <span>Video ထုတ်ရန် (AI Prompts) - Recommended!</span>
+                  </div>
+                  <p class="text-slate-300 leading-relaxed">
+                    <strong>Kling AI, Sora, Runway, Hailuo, Google Flow</strong> စသည့် Video Generator များထဲသို့ တိုက်ရိုက် Paste ထည့်သွင်းပြီး <strong>AI Video ချက်ချင်းထုတ်ယူရန် အကြံပြုထားသော Prompts များ</strong> ဖြစ်ပါသည်။
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tab 2: Scene Prompts (Scene-by-scene breakdown) -->
+              <div class="relative group">
+                <button onclick="switchTab('scenes')" id="tabBtn-scenes" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-slate-200 transition-all cursor-pointer flex items-center gap-1">
+                  <span> Scene Prompts</span>
+                </button>
+                <div class="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-indigo-500/60 rounded-xl shadow-2xl z-50 text-[11px] text-slate-200">
+                  <div class="font-bold text-indigo-300 mb-1 flex items-center gap-1.5">
+                    <span></span>
+                    <span>Scene Prompts (အခန်းလိုက် Prompts & အသံစမ်း)</span>
+                  </div>
+                  <p class="text-slate-300 leading-relaxed">
+                    အခန်းတစ်ခုချင်းစီ (Scene 1, Scene 2...) အတွက် <strong>Camera Movement, Lighting, Visual Prompt</strong> နှင့် <strong>မြန်မာလို စကားပြော Voice Preview အသံစမ်းနားထောင်မှုများ</strong>ကို အနုစိတ် Visual Card များဖြင့် ကြည့်ရှုကူးယူရန် ဖြစ်ပါသည်။
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tab 3: Full Script (Screenplay & Spoken Dialogue) -->
+              <div class="relative group">
+                <button onclick="switchTab('full')" id="tabBtn-full" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-slate-200 transition-all cursor-pointer flex items-center gap-1">
+                  <span> Full Script</span>
+                </button>
+                <div class="tab-tooltip absolute right-0 top-full mt-2 w-72 p-3.5 bg-slate-900/95 border border-purple-500/60 rounded-xl shadow-2xl z-50 text-[11px] text-slate-200">
+                  <div class="font-bold text-purple-300 mb-1 flex items-center gap-1.5">
+                    <span></span>
+                    <span>Full Script (ဇာတ်ညွှန်း အပြည့်အစုံ)</span>
+                  </div>
+                  <p class="text-slate-300 leading-relaxed">
+                    ဇာတ်လမ်းတစ်ပုဒ်လုံး၏ <strong>ဇာတ်ညွှန်း၊ စကားပြောနှင့် အခန်းစဉ်အပြည့်အစုံ</strong>ကို စာအုပ်တစ်အုပ်ကဲ့သို့ ဖတ်ရှုရန်နှင့် Voiceover အသံသွင်းရာတွင် အသုံးပြုရန် ဖြစ်ပါသည်။
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Metadata Badges & Recommendation Info Bar -->
+          <div class="space-y-2 mb-3 shrink-0">
+            <div id="metaBar" class="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+              <span class="bg-indigo-950/80 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800/50" id="badgeStyle">Style: 3D Pixar</span>
+              <span class="bg-pink-950/80 text-pink-300 px-2 py-0.5 rounded border border-pink-800/50" id="badgeGenre">Genre: Comedy</span>
+              <span class="bg-purple-950/80 text-purple-300 px-2 py-0.5 rounded border border-purple-800/50" id="badgeVoice">Voice: Movie Narrator</span>
+              <span class="bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-800/50" id="badgeRatio">16:9 Landscape</span>
+              <span class="bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded border border-amber-800/50" id="badgeScenes">8 Scenes (3 Mins)</span>
+            </div>
+
+            <!-- Recommended Guide Banner -->
+            <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-2.5 flex items-center justify-between gap-2 text-[11px] mm-text">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 flex items-center gap-1 shrink-0">
+                  <span>⭐</span>
+                  <span>အကြံပြုချက်:</span>
+                </span>
+                <span id="tabRecommendationText" class="text-slate-300">
+                  AI Tools (Kling, Sora, Runway, Hailuo) များတွင် <strong>Video တိုက်ရိုက်ထုတ်ယူရန်</strong> အောက်ပါ Visual Prompts များကို အဆင်သင့် ကူးယူနိုင်ပါသည်!
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal Scrollable Output Content Area (Scenes / Full Script / Raw Prompts) -->
+          <div class="flex-1 min-h-0 overflow-hidden flex flex-col">
+            <!-- Tab 1: Scene By Scene Breakdown -->
+            <div id="tabContent-scenes" class="flex-1 overflow-y-auto pr-1.5 space-y-3.5 custom-scrollbar h-full">
+              <!-- Scene cards dynamically injected -->
+            </div>
+
+            <!-- Tab 2: Full Script & Dialogue (Myanmar + English) -->
+            <div id="tabContent-full" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+              <div id="fullScriptBox" class="flex-1 w-full h-full bg-slate-950/80 rounded-xl p-4 md:p-5 text-xs font-mono leading-relaxed text-slate-300 border border-slate-800 whitespace-pre-wrap overflow-y-auto custom-scrollbar shadow-inner"></div>
+            </div>
+
+            <!-- Tab 3: Raw AI Prompt List -->
+            <div id="tabContent-raw" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+              <div id="rawPromptsBox" class="flex-1 w-full h-full bg-slate-950/80 rounded-xl p-4 md:p-5 text-xs font-mono leading-relaxed text-emerald-300 border border-slate-800 whitespace-pre-wrap overflow-y-auto custom-scrollbar shadow-inner"></div>
+            </div>
+          </div>
+
+          <!-- Pinned Bottom Action Buttons -->
+          <div class="pt-3.5 border-t border-slate-800/90 flex flex-wrap items-center justify-between gap-2.5 shrink-0 mt-3">
+            <button onclick="copyCurrentOutput()" class="flex-1 min-w-[180px] py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 flex items-center justify-center gap-2 transition-all cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+              <span>Copy Current Output</span>
+            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="downloadAsText()" class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span>.TXT</span>
+              </button>
+              <button onclick="downloadAsJson()" class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer">
+                <span>{ } .JSON</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Panel 3: Embedded Project History (Step 3) -->
+      <div id="studioPanel-history" class="w-full max-w-5xl mx-auto flex flex-col hidden animate-fade-in">
+        <div class="bg-slate-900/75 border border-slate-800/90 rounded-3xl p-5 md:p-6 shadow-2xl glow-card space-y-4">
+          
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-base"></span>
+              <div>
+                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2 mm-text">
+                  <span>သိမ်းဆည်းထားသော ပရောဂျက် မှတ်တမ်းများ (Saved Projects)</span>
+                  <span id="embeddedHistoryUserTag" class="text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-mono font-bold">User</span>
+                </h3>
+                <p class="text-xs text-slate-400 mm-text" id="embeddedHistoryDesc">ယခင် ထုတ်လုပ်ခဲ့သော Video Prompts များကို ပြန်လည် ကြည့်ရှုအသုံးပြုနိုင်ပါသည်</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportAllHistory()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 cursor-pointer mm-text">
+                <span> Export (.JSON)</span>
+              </button>
+              <button onclick="confirmClearHistory()" class="px-3 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 text-xs font-medium cursor-pointer mm-text">
+                <span>️ Clear All</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- History Mode Tabs: Individual (Private) vs Group (Shared) -->
+          <div class="flex flex-wrap items-center justify-between gap-3 p-1.5 bg-slate-950/90 border border-slate-800 rounded-2xl">
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="switchHistoryScopeTab('individual')" id="histScopeBtn-individual" class="px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer bg-indigo-600 text-white shadow-md mm-text">
+                <span> ကိုယ်ပိုင် မှတ်တမ်း (Individual)</span>
+                <span id="individualScopeCountPill" class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px] font-mono font-bold">0</span>
+              </button>
+              <button type="button" onclick="switchHistoryScopeTab('group')" id="histScopeBtn-group" class="px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-slate-800/80 mm-text">
+                <span> အဖွဲ့လိုက် မှတ်တမ်း (Group History)</span>
+                <span id="groupScopeCountPill" class="px-1.5 py-0.2 rounded-full bg-purple-950 text-purple-300 border border-purple-700/60 text-[10px] font-mono font-bold">0</span>
+              </button>
+            </div>
+
+            <!-- Group Selector for Group History -->
+            <div id="histScopeGroupSelectWrapper" class="hidden flex items-center gap-2">
+              <label class="text-xs text-slate-400 font-semibold mm-text">ရွေးချယ်ထားသော Group:</label>
+              <select id="histScopeGroupSelect" onchange="renderEmbeddedHistoryList()" class="bg-slate-900 border border-purple-700/60 rounded-xl px-3 py-1.5 text-xs text-purple-200 font-semibold focus:outline-none cursor-pointer mm-text">
+                <!-- Populated dynamically via JS -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Search & Filter Bar -->
+          <div class="flex items-center gap-2 text-xs">
+            <div class="relative flex-1">
+              <input type="text" id="embeddedHistorySearchInput" oninput="filterEmbeddedHistoryList()" placeholder="ခေါင်းစဉ်၊ ဖန်တီးသူ သို့မဟုတ် Genre ဖြင့် ရှာဖွေပါ..."
+                class="w-full bg-[#1e293b] border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-slate-100 placeholder-slate-500 text-xs focus:border-indigo-500 focus:outline-none mm-text">
+              <span class="absolute left-2.5 top-2.5 text-slate-400"></span>
+            </div>
+            <button onclick="renderEmbeddedHistoryList()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer mm-text">
+               Refresh
+            </button>
+          </div>
+
+          <!-- History List Container -->
+          <div id="embeddedHistoryListContainer" class="space-y-3 min-h-[300px] max-h-[600px] overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Populated via JS -->
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="mt-8 pt-6 pb-8 border-t border-slate-800/80 text-center space-y-2.5">
+      <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-slate-300">
+        <span class="flex items-center gap-1.5 text-indigo-400 font-mono font-bold">
+          <span></span>
+          <span>CinePrompt AI Studio</span>
+        </span>
+        <span class="text-slate-600"></span>
+        <span class="text-slate-400">Professional AI Cinema & Screenplay Suite</span>
+        <span class="text-slate-600"></span>
+        <span class="text-emerald-400">Multi-AI Cinema Ready</span>
+      </div>
+      <p class="text-[11px] text-slate-500 max-w-xl mx-auto leading-relaxed">
+        Optimized for Google Flow, Kling AI 1.5/2.0, OpenAI Sora, Runway Gen-3 Alpha, Hailuo AI, Luma Dream Machine & Wan 2.1
+      </p>
+      </div>
+    </footer>
+
+  </div> <!-- End of #userStudioView -->
+
+  <!-- ======================================================== -->
+  <!--  FULL-SCREEN DEDICATED SUPER ADMIN CONTROL DASHBOARD -->
+  <!-- ======================================================== -->
+  <div id="adminFullScreenDashboard" class="hidden space-y-6 animate-fade-in">
+
+    <!-- TAB 0: DEDICATED DASHBOARD OVERVIEW & CLICKABLE KPI CARDS -->
+    <div id="adminTabContent-dashboard" class="space-y-6">
+      
+      <!-- Interactive Financial & User KPI Highlights Row (Clickable) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Card 1: Selected Month Revenue -> Clicks to Accounting Tab -->
+        <div onclick="switchAdminTab('accounting')" class="p-5 rounded-3xl bg-slate-900/90 border border-emerald-500/40 hover:border-emerald-400 hover:scale-[1.02] transition-all shadow-xl space-y-2 cursor-pointer group glow-card" title="ငွေစာရင်း စာမျက်နှာသို့ သွားရန် နှိပ်ပါ">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span class="group-hover:text-emerald-300 font-semibold transition-all">ရွေးချယ်ထားသောလ ရငွေ (Selected Month)</span>
+            <span class="text-emerald-400 font-bold text-lg group-hover:scale-125 transition-all"></span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-emerald-300 font-mono" id="adminSelectedMonthRevenue">0 MMK</div>
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span id="adminMonthlySubscribersCount">0 Active Users</span>
+            <span class="text-[10px] text-emerald-400 font-bold underline group-hover:text-emerald-300">ကြည့်ရှုရန် ➔</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Lifetime Revenue -> Clicks to User Accounts Tab -->
+        <div onclick="switchAdminTab('users'); filterAdminUsers('all');" class="p-5 rounded-3xl bg-slate-900/90 border border-indigo-500/40 hover:border-indigo-400 hover:scale-[1.02] transition-all shadow-xl space-y-2 cursor-pointer group glow-card" title="User စာရင်း အားလုံးသို့ သွားရန် နှိပ်ပါ">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span class="group-hover:text-indigo-300 font-semibold transition-all">စုစုပေါင်း ဝင်ငွေ (Lifetime Revenue)</span>
+            <span class="text-indigo-400 font-bold text-lg group-hover:scale-125 transition-all"></span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-indigo-300 font-mono" id="adminTotalLifetimeRevenue">0 MMK</div>
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span id="adminTotalSubscribersCount">0 Registered Accounts</span>
+            <span class="text-[10px] text-indigo-400 font-bold underline group-hover:text-indigo-300">ကြည့်ရှုရန် ➔</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Pending Slips -> Clicks to User Accounts with Pending Filter -->
+        <div onclick="switchAdminTab('users'); filterAdminUsers('pending');" class="p-5 rounded-3xl bg-slate-900/90 border border-amber-500/40 hover:border-amber-400 hover:scale-[1.02] transition-all shadow-xl space-y-2 cursor-pointer group glow-card" title="စစ်ဆေးရန်ကျန်ရှိသော ပြေစာများသို့ တိုက်ရိုက်သွားရန် နှိပ်ပါ">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span class="group-hover:text-amber-300 font-semibold transition-all">စစ်ဆေးရန် ကျန်ရှိသော ပြေစာ (Pending)</span>
+            <span class="text-amber-400 font-bold text-lg group-hover:scale-125 transition-all animate-bounce">⏳</span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-amber-300 font-mono" id="adminPendingApprovalsCount">0 Slips</div>
+          <div class="text-xs text-slate-400 flex items-center justify-between mm-text">
+            <span>Pending Approvals</span>
+            <span class="text-[10px] text-amber-400 font-bold underline group-hover:text-amber-300">အတည်ပြုရန် ➔</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Monthly Fee -> Clicks to Settings Tab -->
+        <div onclick="switchAdminTab('settings')" class="p-5 rounded-3xl bg-slate-900/90 border border-purple-500/40 hover:border-purple-400 hover:scale-[1.02] transition-all shadow-xl space-y-2 cursor-pointer group glow-card" title="လစဉ်ကြေး နှုန်းထား ဆက်တင်သို့ သွားရန် နှိပ်ပါ">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span class="group-hover:text-purple-300 font-semibold transition-all">လစဉ်ကြေး သတ်မှတ်နှုန်း (Monthly Fee)</span>
+            <span class="text-purple-400 font-bold text-lg group-hover:rotate-45 transition-all">⚙️</span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-purple-300 font-mono" id="adminCurrentRateDisplay">20,000 MMK</div>
+          <div class="text-xs text-slate-400 flex items-center justify-between mm-text">
+            <span>/ ၃၀ ရက် သုံးစွဲခွင့်</span>
+            <span class="text-[10px] text-purple-400 font-bold underline group-hover:text-purple-300">ပြင်ဆင်ရန် ➔</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-Time User Activity & Notifications Live Feed Card -->
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-purple-500/30 space-y-3.5 shadow-xl glow-card">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🔔</span>
+            <div>
+              <h4 class="text-xs md:text-sm font-bold text-slate-100 mm-text flex items-center gap-2">
+                <span>တိုက်ရိုက် အသိပေးချက် & User ဝင်ရောက်မှု မှတ်တမ်း (Live Activity Feed)</span>
+              </h4>
+              <p class="text-[11px] text-slate-400 mm-text">User အသစ် ဝင်ရောက်ခြင်းနှင့် ပြေစာတင်သွင်းမှုများကို အချိန်နှင့်တပြေးညီ ကြည့်ရှုပါ</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="dashNotiBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono font-semibold">Up to date</span>
+            <button type="button" onclick="markAdminNotificationsAsRead()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] font-bold transition-all cursor-pointer mm-text">
+              ✓ ဖတ်ပြီးအဖြစ် သတ်မှတ်မည်
+            </button>
+            <button type="button" onclick="switchAdminTab('notifications')" class="px-2.5 py-1 rounded-lg bg-purple-950/80 hover:bg-purple-900 text-purple-300 border border-purple-700/60 text-[11px] font-bold transition-all cursor-pointer mm-text">
+              အားလုံးကြည့်ရန် ➔
+            </button>
+          </div>
+        </div>
+        
+        <!-- Dynamic Live Activity List -->
+        <div id="dashLiveActivityFeed" class="space-y-2.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Quick Action Shortcuts -->
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+          <span>⚡</span>
+          <span>Quick Admin Actions (အမြန် လုပ်ဆောင်ချက်များ)</span>
+        </h4>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-bold mm-text">
+          <button onclick="switchAdminTab('users')" class="p-4 rounded-2xl bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-700/60 text-indigo-200 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.02]">
+            <span class="text-2xl">➕</span>
+            <span>User အသစ် ဖွင့်မည်</span>
+          </button>
+          <button onclick="switchAdminTab('users'); filterAdminUsers('pending');" class="p-4 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border border-amber-700/60 text-amber-200 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.02]">
+            <span class="text-2xl">⏳</span>
+            <span>Pending ပြေစာ စစ်မည်</span>
+          </button>
+          <button onclick="switchAdminTab('accounting')" class="p-4 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-200 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.02]">
+            <span class="text-2xl"></span>
+            <span>ဝင်ငွေ စာရင်းချုပ် ကြည့်မည်</span>
+          </button>
+          <button onclick="exportAccountingCsv()" class="p-4 rounded-2xl bg-purple-950/80 hover:bg-purple-900 border border-purple-700/60 text-purple-200 flex flex-col items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.02]">
+            <span class="text-2xl"></span>
+            <span>Excel Ledger ဒေါင်းမည်</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- User Account Distribution & System Health -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 lg:col-span-2 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-2">
+              <span></span>
+              <span>အသုံးပြုသူ အခြေအနေ ခွဲခြမ်းစိတ်ဖြာချက် (User Status Breakdown)</span>
+            </h4>
+            <span class="text-[10px] text-indigo-400 font-mono" id="dashUserTotalCount">0 Total Users</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div onclick="switchAdminTab('users'); filterAdminUsers('active');" class="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-800/50 cursor-pointer hover:border-emerald-400 transition-all">
+              <div class="text-[11px] text-emerald-400 font-semibold mm-text">Active Members</div>
+              <div class="text-2xl font-bold text-emerald-300 font-mono mt-1" id="dashCountActive">0</div>
+            </div>
+            <div onclick="switchAdminTab('users'); filterAdminUsers('suspended');" class="p-3.5 rounded-2xl bg-rose-950/40 border border-rose-800/50 cursor-pointer hover:border-rose-400 transition-all">
+              <div class="text-[11px] text-rose-400 font-semibold mm-text">Suspended</div>
+              <div class="text-2xl font-bold text-rose-300 font-mono mt-1" id="dashCountSuspended">0</div>
+            </div>
+            <div onclick="switchAdminTab('users'); filterAdminUsers('pending');" class="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-800/50 cursor-pointer hover:border-amber-400 transition-all">
+              <div class="text-[11px] text-amber-400 font-semibold mm-text">Pending Slips</div>
+              <div class="text-2xl font-bold text-amber-300 font-mono mt-1" id="dashCountPending">0</div>
+            </div>
+            <div onclick="switchAdminTab('users'); filterAdminUsers('expired');" class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 cursor-pointer hover:border-slate-400 transition-all">
+              <div class="text-[11px] text-slate-400 font-semibold mm-text">Expired / Trial</div>
+              <div class="text-2xl font-bold text-slate-300 font-mono mt-1" id="dashCountExpired">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-3 shadow-xl">
+          <div class="border-b border-slate-800 pb-2.5">
+            <h4 class="text-xs font-bold text-slate-200 flex items-center gap-2">
+              <span>️</span>
+              <span>System & Gateway Status</span>
+            </h4>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
+              <span class="text-slate-400">Master PIN:</span>
+              <span class="font-mono text-purple-300 font-bold" id="dashMasterPin">888888</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
+              <span class="text-slate-400">KBZPay Account:</span>
+              <span class="font-mono text-teal-300 font-bold" id="dashKpayNum">09-987654321</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
+              <span class="text-slate-400">WavePay Account:</span>
+              <span class="font-mono text-amber-300 font-bold" id="dashWaveNum">09-987654321</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 1: USER ACCOUNT & OTP & SUSPEND/ACTIVE -->
+    <div id="adminTabContent-users" class="hidden space-y-6">
+      
+      <!-- Card 1: Create User & Issue OTP -->
+      <div class="p-5 md:p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-[#1e1b4b]/40 to-slate-900 border border-indigo-500/40 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-bold text-slate-100 flex items-center gap-2 text-sm mm-text">
+            <span class="text-base">➕</span>
+            <span>အသုံးပြုသူ အကောင့်သစ် ဖွင့်ပေးခြင်း & 6-Digit OTP ထုတ်ပေးခြင်း (Create User & Issue OTP)</span>
+          </h3>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-700/60 font-mono">ADMIN EXCLUSIVE</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">Gmail / Email လိပ်စာ:</label>
+            <input type="email" id="adminNewUserEmail" placeholder="ဥပမာ- creator@gmail.com" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none font-medium">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">Username (အသုံးပြုသူ နာမည်အတို):</label>
+            <input type="text" id="adminNewUserUsername" placeholder="ဥပမာ- creator_mgmg" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none font-medium">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">အမည် (Display Name):</label>
+            <input type="text" id="adminNewUserName" placeholder="ဥပမာ- Ko Mg Mg" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none font-medium">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">အကောင့် အမျိုးအစား (Role):</label>
+            <select id="adminNewUserRole" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none mm-text">
+              <option value="user">Regular Member (အသုံးပြုသူ)</option>
+              <option value="tester">VIP Tester (ကန့်သတ်မဲ့ စမ်းသပ်သူ)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text flex items-center justify-between">
+              <span>သက်တမ်း ကာလ (Subscription Duration):</span>
+              <span id="customDaysHint" class="text-[10px] text-amber-300 font-normal hidden font-mono">✍️ စိတ်ကြိုက်ရက်</span>
+            </label>
+            <div class="space-y-1.5">
+              <select id="adminNewUserDuration" onchange="onAdminDurationSelectChange()" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none mm-text">
+                <option value="30" selected> ရက်ပေါင်း ၃၀ (၁ လ - Regular)</option>
+                <option value="7">⚡ ၇ ရက် (၁ ပတ် အစမ်း)</option>
+                <option value="15">⚡ ၁၅ ရက် (ရက်သတ္တ ၂ ပတ်)</option>
+                <option value="60"> ရက်ပေါင်း ၆၀ (၂ လ)</option>
+                <option value="90"> ရက်ပေါင်း ၉၀ (၃ လ)</option>
+                <option value="180"> ရက်ပေါင်း ၁၈၀ (၆ လ)</option>
+                <option value="365"> ၁ နှစ် (၃၆၅ ရက် - Annual)</option>
+                <option value="3650"> ၁၀ နှစ် (Unlimited Master)</option>
+                <option value="custom">✍️ စိတ်ကြိုက် ရက်အရေအတွက် သတ်မှတ်မည် (Custom Days)...</option>
+                <option value="0"> Free Trial (သက်တမ်းမပါ - ၁ ကြိမ်)</option>
+              </select>
+              <div id="adminCustomDaysWrapper" class="hidden">
+                <div class="relative">
+                  <input type="number" id="adminNewUserCustomDays" min="1" max="9999" placeholder="ရက်အရေအတွက် ရိုက်ထည့်ပါ (ဥပမာ- 45)" class="w-full bg-[#1e293b] border border-amber-500/80 rounded-xl px-3.5 py-2 text-amber-200 text-xs font-mono font-bold focus:border-amber-400 focus:outline-none placeholder:text-slate-500">
+                  <span class="absolute right-3.5 top-2 text-xs text-amber-400 font-mono font-bold">ရက် (Days)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-end">
+            <button type="button" onclick="adminCreateUserWithOtp()" class="w-full py-2.5 px-4 rounded-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all cursor-pointer mm-text text-xs">
+              <span>✨</span>
+              <span>အကောင့်ဖွင့် & OTP ထုတ်မည်</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic OTP Result Display Box -->
+        <div id="adminOtpResultBox" class="hidden p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/60 text-emerald-200 text-xs space-y-2 animate-fade-in">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="font-bold text-emerald-300 flex items-center gap-1.5 mm-text text-sm">
+              <span></span>
+              <span>အကောင့် အောင်မြင်စွာ ဖွင့်ပြီး OTP ထုတ်ပေးလိုက်ပါပြီ!</span>
+            </div>
+            <button type="button" onclick="copyAdminOtpMessage()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm cursor-pointer mm-text flex items-center gap-1">
+              <span></span>
+              <span>User ထံ ပေးပို့ရန် စာသား Copy ယူမည်</span>
+            </button>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 font-mono text-xs text-slate-200 border border-slate-800 flex flex-wrap items-center justify-between gap-2" id="adminOtpResultText">
+            <!-- Text populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Dedicated System Accounts Panel (စနစ်သုံး အထူးအကောင့်များ) -->
+      <div class="p-5 md:p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-[#1b1938] to-slate-900 border border-purple-500/40 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-slate-100 text-sm mm-text flex items-center gap-2">
+              <span class="text-base">️</span>
+              <span>စနစ်သုံး အထူးအကောင့်များ (System Master Accounts)</span>
+            </h3>
+          </div>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700/60 font-mono font-bold">SYSTEM PROTECTED</span>
+        </div>
+
+        <!-- System Accounts Grid -->
+        <div id="adminSystemAccountsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+          <!-- Populated via renderAdminUsersTable() in JS -->
+        </div>
+      </div>
+
+      <!-- Card 3: Regular Customer / Member Accounts Panel (သာမန် အသုံးပြုသူ အကောင့်များ) -->
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-slate-100 text-sm mm-text flex items-center gap-2">
+              <span class="text-base"></span>
+              <span>သာမန် အသုံးပြုသူ အကောင့်များ စီမံခန့်ခွဲခြင်း (Customer Subscriber Accounts)</span>
+            </h3>
+          </div>
+          
+          <!-- Quick Search Bar -->
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <input type="text" id="adminSearchUserInput" oninput="renderAdminUsersTable()" placeholder=" Username / Gmail ရှာဖွေပါ..." class="bg-[#1e293b] border border-slate-700 rounded-xl pl-3 pr-3 py-1.5 text-xs text-slate-100 focus:outline-none font-medium w-52 md:w-64">
+            </div>
+            <button onclick="renderAdminUsersTable()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer mm-text text-xs">
+               Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Filter Tabs (For Customers Only) -->
+        <div class="flex flex-wrap items-center gap-2 text-xs mm-text">
+          <button onclick="filterAdminUsers('all')" id="userFilter-all" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold cursor-pointer transition-all">အားလုံး All (<span id="countFilterAll">0</span>)</button>
+          <button onclick="filterAdminUsers('active')" id="userFilter-active" class="px-3 py-1.5 rounded-xl text-emerald-300 hover:text-white bg-slate-950 border border-slate-800 cursor-pointer transition-all">✅ အတည်ပြုပြီး Active (<span id="countFilterActive">0</span>)</button>
+          <button onclick="filterAdminUsers('suspended')" id="userFilter-suspended" class="px-3 py-1.5 rounded-xl text-rose-300 hover:text-white bg-slate-950 border border-slate-800 cursor-pointer transition-all">⛔ ရပ်ဆိုင်းထားသူ Suspended (<span id="countFilterSuspended">0</span>)</button>
+          <button onclick="filterAdminUsers('pending')" id="userFilter-pending" class="px-3 py-1.5 rounded-xl text-amber-300 hover:text-white bg-slate-950 border border-slate-800 cursor-pointer transition-all">⏳ ပြေစာတင်ထားသူ Pending (<span id="countFilterPending">0</span>)</button>
+          <button onclick="filterAdminUsers('expired')" id="userFilter-expired" class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white bg-slate-950 border border-slate-800 cursor-pointer transition-all">❌ သက်တမ်းကုန် Expired (<span id="countFilterExpired">0</span>)</button>
+        </div>
+
+        <!-- Dynamic Users List Container (Customer Users Only) -->
+        <div id="adminUsersListContainer" class="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar text-xs">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: FINANCIAL ACCOUNTING & PAYMENT LEDGER -->
+    <div id="adminTabContent-accounting" class="space-y-6 hidden">
+      
+      <!-- Month Filter & Ledger Exports -->
+      <div class="p-5 rounded-3xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between gap-4 text-xs shadow-xl">
+        <div class="flex items-center gap-3">
+          <span class="font-bold text-slate-200 mm-text flex items-center gap-1.5 text-sm">
+            <span></span>
+            <span>စာရင်းတွက်မည့် ကာလ:</span>
+          </span>
+          <select id="adminAccountingMonth" onchange="renderAdminAccounting()" class="bg-[#1e293b] border border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none mm-text font-semibold shadow-inner">
+            <option value="all">အားလုံး (Lifetime Summary)</option>
+            <option value="2026-08" selected>သြဂုတ်လ ၂၀၂၆ (August 2026)</option>
+            <option value="2026-09">စက်တင်ဘာလ ၂၀၂၆ (September 2026)</option>
+            <option value="2026-10">အောက်တိုဘာလ ၂၀၂၆ (October 2026)</option>
+            <option value="2026-11">နိုဝင်ဘာလ ၂၀၂၆ (November 2026)</option>
+            <option value="2026-12">ဒီဇင်ဘာလ ၂၀၂၆ (December 2026)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button onclick="exportAccountingCsv()" class="px-4 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-700/60 font-bold flex items-center gap-2 transition-all cursor-pointer mm-text shadow-sm hover:scale-105">
+            <span> Export Excel (.CSV)</span>
+          </button>
+          <button onclick="exportAccountingJson()" class="px-4 py-2 rounded-xl bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 font-bold flex items-center gap-2 transition-all cursor-pointer mm-text shadow-sm hover:scale-105">
+            <span> JSON Ledger</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Financial Metric Cards for Selected Period -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-5 rounded-3xl bg-slate-900/90 border border-emerald-500/40 shadow-xl space-y-1.5">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span>ကာလအလိုက် စုစုပေါင်း ရငွေ</span>
+            <span class="text-emerald-400 font-bold text-lg"></span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-emerald-300 font-mono" id="ledgerPeriodRevenue">0 MMK</div>
+          <div class="text-[11px] text-slate-400 font-mono">Actual Verified Revenue</div>
+        </div>
+
+        <div class="p-5 rounded-3xl bg-slate-900/90 border border-indigo-500/40 shadow-xl space-y-1.5">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span>လစဉ်ကြေး ပေးသွင်းသူဦးရေ</span>
+            <span class="text-indigo-400 font-bold text-lg"></span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-indigo-300 font-mono" id="ledgerPeriodPaidUsers">0 Users</div>
+          <div class="text-[11px] text-slate-400 font-mono">Paid Subscriber Accounts</div>
+        </div>
+
+        <div class="p-5 rounded-3xl bg-slate-900/90 border border-purple-500/40 shadow-xl space-y-1.5">
+          <div class="text-xs text-slate-400 mm-text flex items-center justify-between">
+            <span>သတ်မှတ်ထားသော လစဉ်ကြေး</span>
+            <span class="text-purple-400 font-bold text-lg">⚙️</span>
+          </div>
+          <div class="text-2xl lg:text-3xl font-black text-purple-300 font-mono" id="ledgerPeriodMonthlyRate">20,000 MMK</div>
+          <div class="text-[11px] text-slate-400 font-mono">Standard Monthly Rate</div>
+        </div>
+      </div>
+
+      <!-- Real Transaction & Payment Ledger Table -->
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="font-bold text-slate-100 flex items-center gap-2 mm-text text-sm">
+            <span></span>
+            <span>ငွေပေးချေမှု & ရငွေ အသေးစိတ် စာရင်းဇယား (Payment & Income Ledger)</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono" id="ledgerRowCount">0 Transactions</span>
+        </div>
+
+        <!-- Ledger Table Items -->
+        <div id="adminLedgerTableContainer" class="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 custom-scrollbar text-xs">
+          <!-- Populated via renderAdminAccounting() in JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: FEE & GATEWAY SETTINGS -->
+    <div id="adminTabContent-settings" class="space-y-6 hidden">
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-slate-800 space-y-4 shadow-xl">
+        <h3 class="font-bold text-slate-100 flex items-center gap-2 text-sm mm-text border-b border-slate-800 pb-3">
+          <span>⚙️</span>
+          <span>လစဉ်ကြေး နှုန်းထား & ငွေလက်ခံ အကောင့်များ ပြင်ဆင်ခြင်း (Payment Gateways)</span>
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">လစဉ်ကြေး သတ်မှတ်နှုန်းထား (MMK):</label>
+            <input type="number" id="adminFeeSettingInput" value="20000" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs font-mono focus:border-purple-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">Super Admin Master PIN:</label>
+            <input type="password" id="adminPinSettingInput" value="888888" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs font-mono focus:border-purple-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">KBZPay ဖုန်းနံပါတ် & အမည်:</label>
+            <input type="text" id="adminKpayInput" value="09-799887766 (Prompt Master Studio)" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs font-medium focus:border-purple-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1.5 mm-text">WavePay ဖုန်းနံပါတ် & အမည်:</label>
+            <input type="text" id="adminWaveInput" value="09-799887766 (Prompt Master Studio)" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-100 text-xs font-medium focus:border-purple-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800 flex justify-end">
+          <button onclick="saveAdminSettings()" class="px-6 py-2.5 rounded-xl font-bold bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all cursor-pointer mm-text text-xs">
+            <span></span>
+            <span>ဆက်တင်များ သိမ်းဆည်းမည်</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: FULL NOTIFICATIONS AUDIT LOG -->
+    <div id="adminTabContent-notifications" class="hidden space-y-4">
+      <div class="p-5 md:p-6 rounded-3xl bg-slate-900/90 border border-purple-500/40 shadow-2xl space-y-4 glow-card">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-purple-950/80 border border-purple-700/60 flex items-center justify-center text-xl text-purple-300">
+              🔔
+            </div>
+            <div>
+              <h3 class="text-sm md:text-base font-bold text-slate-100 mm-text flex items-center gap-2">
+                <span>အသိပေးချက် & User လှုပ်ရှားမှု မှတ်တမ်းအပြည့်အစုံ (Notifications Log)</span>
+              </h3>
+              <p class="text-xs text-slate-400 mm-text">User ဝင်ရောက်မှု (Logins)၊ ပြေစာတင်သွင်းမှုများနှင့် စနစ်မှတ်တမ်းများ</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="markAdminNotificationsAsRead()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer mm-text flex items-center gap-1.5 shadow-sm">
+              <span>✓</span>
+              <span>ဖတ်ပြီးအဖြစ် သတ်မှတ်မည်</span>
+            </button>
+            <button type="button" onclick="clearAdminNotifications()" class="px-3.5 py-1.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/60 text-xs font-bold transition-all cursor-pointer mm-text flex items-center gap-1.5 shadow-sm">
+              <span>🗑️</span>
+              <span>အားလုံးဖျက်မည်</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Full Notifications List -->
+        <div id="adminNotificationsFullList" class="space-y-3 max-h-[65vh] overflow-y-auto pr-1.5 custom-scrollbar">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Settings Modal (Gemini API Configuration) -->
+  <div id="settingsModal" onclick="if(event.target===this) closeSettingsModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-slate-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+          <span>⚙️</span>
+          <span>Gemini API Settings (ဆက်တင်များ)</span>
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-200 p-1">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-semibold text-slate-300">Google Gemini API Key:</label>
+            <button onclick="toggleApiKeyVisibility()" type="button" class="text-[11px] text-slate-400 hover:text-indigo-300 flex items-center gap-1">
+              <span id="eyeIcon">️</span>
+              <span id="eyeText">Show</span>
+            </button>
+          </div>
+          
+          <div class="relative">
+            <input type="password" id="apiKeyInput" placeholder="AIzaSy..."
+              class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none font-mono">
+          </div>
+
+          <div class="flex items-center justify-between mt-1.5">
+            <span class="text-[10px] text-slate-400">Browser ထဲတွင်သာ လုံခြုံစွာ သိမ်းပါမည်</span>
+            <button onclick="openHelpModal()" class="text-[11px] text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1">
+              <span>❓ ချိတ်ဆက်နည်း လမ်းညွှန်</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Gemini Model ရွေးချယ်ရန်:</label>
+          <select id="modelSelect" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-indigo-500 focus:outline-none">
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash (အမြန်ဆန်ဆုံးနှင့် နောက်ဆုံးပေါ် - Recommended)</option>
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (ပေါ့ပါးမြန်ဆန်)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro (အနုစိတ် အကောင်းဆုံး)</option>
+          </select>
+        </div>
+
+        <div class="pt-2">
+          <button onclick="testApiKey()" id="testApiBtn" class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 font-semibold border border-slate-700 transition-all flex items-center justify-center gap-1.5">
+            <span></span>
+            <span>API Key စစ်ဆေးမည် (Test Key)</span>
+          </button>
+          <div id="testApiMsg" class="hidden"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-indigo-400 hover:underline flex items-center gap-1">
+          <span> Google AI Studio</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <button onclick="closeSettingsModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200">
+            ပယ်ဖျက် (Cancel)
+          </button>
+          <button onclick="saveSettings()" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30">
+            သိမ်းမည် (Save)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Guide Modal (Step-by-step Setup Instructions) -->
+  <div id="helpModal" onclick="if(event.target===this) closeHelpModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-slate-700/80 rounded-2xl max-w-2xl w-full p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col glow-card">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-base"></span>
+          <div>
+            <h3 class="text-base font-bold text-slate-100">Google Gemini API Key ချိတ်ဆက်နည်း လမ်းညွှန်</h3>
+            <p class="text-xs text-slate-400">အဆင့် (၅) ဆင့်ဖြင့် အခမဲ့ API Key ရယူပြီး ချိတ်ဆက်နိုင်ပါသည်</p>
+          </div>
+        </div>
+        <button onclick="closeHelpModal()" class="text-slate-400 hover:text-slate-200 p-1 text-lg">✕</button>
+      </div>
+
+      <!-- Steps Content (Scrollable) -->
+      <div class="flex-1 overflow-y-auto space-y-3.5 pr-1 text-xs custom-scrollbar">
+        
+        <!-- Direct Link Banner -->
+        <div class="p-3 rounded-xl bg-gradient-to-r from-indigo-950/80 to-purple-950/80 border border-indigo-700/50 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="font-bold text-indigo-300">Google AI Studio မှ အခမဲ့ ရယူရန်:</span>
+            <p class="text-[11px] text-slate-400">Google အကောင့် (Gmail) ရှိရုံဖြင့် အခမဲ့ ထုတ်ယူနိုင်ပါသည်</p>
+          </div>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1 shadow-md">
+            <span> Open Google AI Studio</span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="bg-[#1e293b]/70 border border-slate-700/80 rounded-xl p-3.5 flex gap-3 items-start">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">1</span>
+          <div class="space-y-1">
+            <h4 class="font-bold text-slate-200">Google AI Studio ဝဘ်ဆိုက်သို့ သွားပါ</h4>
+            <p class="text-slate-400 leading-relaxed">
+              အပေါ်ရှိ ခလုတ် သို့မဟုတ် <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 underline">aistudio.google.com/app/apikey</a> သို့ သွားပြီး မိမိ၏ Google Account (Gmail) ဖြင့် ဝင်ရောက် (Sign In) ပါ။
+            </p>
+            <span class="inline-block text-[10px] text-amber-300 bg-amber-950/50 px-2 py-0.5 rounded border border-amber-800/40">
+               ဝဘ်ဆိုက် ဝင်မရပါက VPN (Singapore သို့မဟုတ် US) ကို ခေတ္တ ဖွင့်ပေးပါ
+            </span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-[#1e293b]/70 border border-slate-700/80 rounded-xl p-3.5 flex gap-3 items-start">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">2</span>
+          <div class="space-y-1">
+            <h4 class="font-bold text-slate-200">"Create API key" ခလုတ်ကို နှိပ်ပါ</h4>
+            <p class="text-slate-400 leading-relaxed">
+              စာမျက်နှာပေါ်ရှိ အပြာရောင် <span class="text-indigo-300 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">"Create API key"</span> (သို့မဟုတ် Get API Key) ခလုတ်ကို နှိပ်ပါ။
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-[#1e293b]/70 border border-slate-700/80 rounded-xl p-3.5 flex gap-3 items-start">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">3</span>
+          <div class="space-y-1">
+            <h4 class="font-bold text-slate-200">"Create API key in new project" ကို ရွေးချယ်ပါ</h4>
+            <p class="text-slate-400 leading-relaxed">
+              ပေါ်လာသော Box တွင် <span class="text-emerald-300 font-semibold bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">Create API key in new project</span> ကို ရွေးချယ်လိုက်ပါက Google က API Key အသစ်တစ်ခု ထုတ်ပေးပါမည်။
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="bg-[#1e293b]/70 border border-slate-700/80 rounded-xl p-3.5 flex gap-3 items-start">
+          <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">4</span>
+          <div class="space-y-1">
+            <h4 class="font-bold text-slate-200">ထွက်လာသော API Key ကုဒ်ကို Copy ယူပါ</h4>
+            <p class="text-slate-400 leading-relaxed">
+              ထွက်ပေါ်လာသော <span class="font-mono text-indigo-300 bg-slate-900 px-1.5 py-0.5 rounded">AIzaSy...</span> ဖြင့် စတင်သည့် Key ကုဒ်ရှည်ကို <span class="font-semibold text-slate-200">"Copy"</span> နှိပ်၍ ကူးယူပါ။
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="bg-[#1e293b]/70 border border-slate-700/80 rounded-xl p-3.5 flex gap-3 items-start">
+          <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0">5</span>
+          <div class="space-y-1">
+            <h4 class="font-bold text-emerald-300">ဤ App ထဲရှိ Settings တွင် Paste ထည့်၍ သိမ်းဆည်းပါ</h4>
+            <p class="text-slate-400 leading-relaxed">
+              ဤ App ၏ <span class="text-indigo-300 font-semibold">Gemini Settings</span> ထဲသို့ ပြန်သွားပြီး <span class="font-mono text-slate-200">Google Gemini API Key</span> အကွက်ထဲတွင် Paste ချပါ။ ထို့နောက် <span class="font-semibold text-emerald-400">"API Key စစ်ဆေးမည်"</span> ကို နှိပ်၍ စစ်ဆေးပြီး <span class="font-semibold text-indigo-400">"သိမ်းဆည်းမည် (Save)"</span> ကို နှိပ်ပါက အောင်မြင်စွာ ချိတ်ဆက်ပြီး ဖြစ်ပါသည်!
+            </p>
+          </div>
+        </div>
+
+        <!-- FAQ Box -->
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+          <h4 class="font-bold text-indigo-300 flex items-center gap-1.5">
+            <span>❓</span>
+            <span>မကြာခဏ မေးလေ့ရှိသော မေးခွန်းများ (FAQ)</span>
+          </h4>
+          <div class="space-y-2 text-[11px] text-slate-300">
+            <div>
+              <p class="font-semibold text-slate-200">Q: Gemini API Key သည် လုံးဝ အခမဲ့လား?</p>
+              <p class="text-slate-400">A: ဟုတ်ကဲ့၊ Google က တစ်မိနစ်လျှင် Request ၁၅ ခုနှင့် တစ်ရက်လျှင် Request ထောင်ပေါင်းများစွာကို Free Tier ဖြင့် ၁၀၀% အခမဲ့ အသုံးပြုခွင့်ပေးထားပါသည်။</p>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-200">Q: API Key သည် အခြားသူများထံ ရောက်သွားနိုင်သလား (လုံခြုံမှု)?</p>
+              <p class="text-slate-400">A: မရောက်နိုင်ပါ။ သင်၏ Browser Local Storage ထဲတွင်သာ သိမ်းဆည်းထားပြီး မည်သည့်ပြင်ပ Server သို့မျှ ပေးပို့ခြင်း မရှိပါ။</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex justify-end pt-3 border-t border-slate-800">
+        <button onclick="closeHelpModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
+          ပိတ်မည် (Close)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dedicated Authentication & Login Gateway Modal -->
+  <div id="authGatewayModal" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50">
+    <div class="bg-[#111827] border border-indigo-500/40 rounded-2xl max-w-md w-full p-5 md:p-6 shadow-2xl space-y-3.5 glow-card max-h-[96vh] flex flex-col animate-fade-in relative">
+      
+      <!-- Close Button (Allows closing modal anytime) -->
+      <button type="button" onclick="hideAuthGatewayModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition-all cursor-pointer z-10" title="ပိတ်မည်">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <!-- Logo & Studio Brand Header -->
+      <div class="text-center space-y-1 pb-2 border-b border-slate-800">
+        <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 items-center justify-center shadow-lg shadow-indigo-500/40 text-2xl font-black text-white mb-1">
+          🎬
+        </div>
+        <h2 class="text-lg font-black text-slate-100 mm-text tracking-wide">
+          <span class="gradient-title">CinePrompt AI Studio</span>
+        </h2>
+        <p class="text-xs text-slate-400 mm-text">အကောင့်ဝင်ရောက်ရန် (Sign In / Login Gateway)</p>
+      </div>
+
+      <!-- Dynamic Error/Warning Banner -->
+      <div id="authErrorNotice" class="hidden p-2.5 rounded-xl bg-rose-950/90 border border-rose-500/60 text-rose-200 text-xs font-semibold flex items-center gap-2 animate-fade-in">
+        <span class="text-base shrink-0">⚠️</span>
+        <span id="authErrorText" class="mm-text">Username သို့မဟုတ် Password မှားယွင်းနေပါသည်!</span>
+      </div>
+
+      <!-- SIGN IN FORM -->
+      <form onsubmit="event.preventDefault(); handleAuthLogin(event); return false;" class="space-y-3 text-xs flex-1 overflow-y-auto pr-1 custom-scrollbar">
+        <!-- Username Input -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1 mm-text">Username သို့မဟုတ် Gmail:</label>
+          <div class="pw-group">
+            <span class="flex items-center pl-3 text-slate-400 text-sm select-none">👤</span>
+            <input type="text" id="authLoginUsername" placeholder="Username သို့မဟုတ် Gmail ရိုက်ထည့်ပါ..." autocomplete="username" onkeydown="if(event.key==='Enter'){ event.preventDefault(); handleAuthLogin(event); }">
+          </div>
+        </div>
+
+        <!-- Password Input with eye toggle -->
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1 mm-text">Password သို့မဟုတ် OTP Code:</label>
+          <div class="pw-group">
+            <span class="flex items-center pl-3 text-slate-400 text-sm select-none">🔒</span>
+            <input type="password" id="authLoginPassword" placeholder="Password ရိုက်ထည့်ပါ..." autocomplete="current-password" onkeydown="if(event.key==='Enter'){ event.preventDefault(); handleAuthLogin(event); }">
+            <button type="button" onclick="togglePasswordVisibility('authLoginPassword', this)" title="Password ပြမည်/ဝှက်မည်" class="cursor-pointer text-base">
+              👁️
+            </button>
+          </div>
+        </div>
+
+        <!-- Login Action Button -->
+        <button type="button" id="authSubmitBtn" onclick="handleAuthLogin(event)" class="w-full py-2.5 rounded-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-600/40 flex items-center justify-center gap-2 transition-all cursor-pointer mm-text text-xs">
+          <span>🚀</span>
+          <span>အကောင့်ဝင်ရောက်မည် (Sign In)</span>
+        </button>
+
+        <!-- Free Guest Trial Option -->
+        <div class="pt-2 border-t border-slate-800 text-center">
+          <button type="button" onclick="startGuestTrial()" class="w-full py-2 px-3 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer mm-text">
+            <span>🎁</span>
+            <span>အကောင့်မဝင်ဘဲ အခမဲ့ စမ်းသပ်သုံးမည် (Free Trial)</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Admin Customize Subscription Duration Modal -->
+  <div id="adminExtendModal" onclick="if(event.target===this) closeAdminExtendModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-purple-500/50 rounded-2xl max-w-md w-full p-5 md:p-6 shadow-2xl space-y-4 glow-card animate-fade-in">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2 mm-text">
+          <span>⏳ သက်တမ်း ကာလ စိတ်ကြိုက်တိုးပေးခြင်း (Customize Subscription)</span>
+        </h3>
+        <button onclick="closeAdminExtendModal()" class="text-slate-400 hover:text-slate-200 text-sm p-1 rounded-lg hover:bg-slate-800 cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 space-y-1 mm-text text-xs">
+        <div class="text-slate-300 font-bold flex items-center gap-1.5">
+          <span id="extendTargetAvatar" class="text-lg">‍</span>
+          <span id="extendTargetName" class="text-white">Ko Kyaw</span>
+          <span id="extendTargetUsername" class="text-indigo-300 font-mono text-xs">(@kyawkyaw)</span>
+        </div>
+        <div class="text-[11px] text-slate-400 font-mono">
+          <span> </span><span id="extendTargetEmail">kyawkyaw@gmail.com</span> | 
+          <span>လက်ရှိ: </span><span id="extendCurrentExpiry" class="text-emerald-300 font-bold">2026-09-22</span>
+        </div>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5 mm-text">အမြန်ရွေးချယ်ရန် ရက်ကာလများ (Quick Presets):</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="setExtendPresetDays(7)" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono font-bold text-[11px] border border-slate-700 transition-all cursor-pointer text-center">
+              +7 ရက် (၁ ပတ်)
+            </button>
+            <button type="button" onclick="setExtendPresetDays(15)" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono font-bold text-[11px] border border-slate-700 transition-all cursor-pointer text-center">
+              +15 ရက်
+            </button>
+            <button type="button" onclick="setExtendPresetDays(30)" class="py-2 px-2 rounded-xl bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 font-mono font-bold text-[11px] border border-indigo-700/60 transition-all cursor-pointer text-center">
+              +30 ရက် (၁ လ)
+            </button>
+            <button type="button" onclick="setExtendPresetDays(60)" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono font-bold text-[11px] border border-slate-700 transition-all cursor-pointer text-center">
+              +60 ရက် (၂ လ)
+            </button>
+            <button type="button" onclick="setExtendPresetDays(90)" class="py-2 px-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono font-bold text-[11px] border border-slate-700 transition-all cursor-pointer text-center">
+              +90 ရက် (၃ လ)
+            </button>
+            <button type="button" onclick="setExtendPresetDays(365)" class="py-2 px-2 rounded-xl bg-purple-950 hover:bg-purple-900 text-purple-200 font-mono font-bold text-[11px] border border-purple-700/60 transition-all cursor-pointer text-center">
+              +365 ရက် (၁ နှစ်)
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5 mm-text">တိုးပေးမည့် ရက်အရေအတွက် (သို့မဟုတ် စိတ်ကြိုက်ရိုက်ထည့်ပါ):</label>
+          <div class="relative">
+            <input type="number" id="extendCustomDaysInput" min="1" max="9999" value="30" oninput="updateExtendCalculatedDate()" class="w-full bg-[#1e293b] border border-purple-500/60 rounded-xl px-3.5 py-2.5 text-white font-mono font-bold text-sm focus:border-purple-400 focus:outline-none">
+            <span class="absolute right-3.5 top-2.5 text-xs text-purple-300 font-bold font-mono">ရက် (Days) တိုးမည်</span>
+          </div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-700/40 text-[11px] text-emerald-200 flex items-center justify-between">
+          <span>တိုးပေးပြီးနောက် သက်တမ်းကုန်ဆုံးမည့်ရက်:</span>
+          <span id="extendCalculatedNewDate" class="font-mono font-bold text-emerald-300">...</span>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeAdminExtendModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer mm-text">
+          ပယ်ဖျက်မည်
+        </button>
+        <button type="button" onclick="confirmAdminExtendSubscription()" class="px-5 py-2 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-900/40 cursor-pointer mm-text text-xs flex items-center gap-1.5">
+          <span>✅ သက်တမ်းတိုး အတည်ပြုမည်</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change / Set New Password Modal -->
+  <div id="changePasswordModal" onclick="if(event.target===this) closeChangePasswordModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-amber-500/50 rounded-2xl max-w-md w-full p-5 md:p-6 shadow-2xl space-y-4 glow-card animate-fade-in">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2 mm-text">
+          <span> Password အသစ် သတ်မှတ်ခြင်း (Set New Password)</span>
+        </h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-slate-200 text-sm p-1 rounded-lg hover:bg-slate-800 cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-600/30 text-amber-200 text-xs mm-text space-y-1">
+        <div class="font-bold text-amber-300 flex items-center gap-1">
+          <span>️</span>
+          <span id="changePwAccountTitle">အကောင့်လုံခြုံရေးအတွက် Password အသစ် သတ်မှတ်ပါ</span>
+        </div>
+        <div class="text-[11px] text-slate-300">သင်ကိုယ်တိုင် အမြဲမှတ်မိနိုင်မည့် Password အသစ်ကို သတ်မှတ်ပေးပါခင်ဗျာ။</div>
+      </div>
+
+      <!-- Inline Notice / Error Banner -->
+      <div id="changePwErrorNotice" class="hidden p-2.5 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-semibold flex items-center gap-2 animate-fade-in mm-text"></div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5 mm-text">Password အသစ် (New Password):</label>
+          <div class="pw-group">
+            <span class="flex items-center pl-3 text-slate-400 text-sm select-none"></span>
+            <input type="password" id="newPasswordInput" onkeydown="if(event.key==='Enter') saveNewPassword()" placeholder="Password အသစ် ရိုက်ထည့်ပါ..." autocomplete="new-password">
+            <button type="button" onclick="togglePasswordVisibility('newPasswordInput', this)" title="Password ပြမည်/ဝှက်မည်">
+              ️
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1.5 mm-text">Password အတည်ပြုပါ (Confirm Password):</label>
+          <div class="pw-group">
+            <span class="flex items-center pl-3 text-slate-400 text-sm select-none"></span>
+            <input type="password" id="confirmPasswordInput" onkeydown="if(event.key==='Enter') saveNewPassword()" placeholder="Password အသစ် ထပ်မံရိုက်ထည့်ပါ..." autocomplete="new-password">
+            <button type="button" onclick="togglePasswordVisibility('confirmPasswordInput', this)" title="Password ပြမည်/ဝှက်မည်">
+              ️
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+        <button onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 cursor-pointer mm-text">
+          ပယ်ဖျက်မည် (Cancel)
+        </button>
+        <button onclick="saveNewPassword()" class="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer mm-text">
+          <span></span>
+          <span>Password အသစ် သိမ်းဆည်းမည်</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!--  GROUP STUDIO & TEAM COLLABORATION MODAL -->
+  <!-- ======================================================== -->
+  <div id="groupStudioModal" onclick="if(event.target===this) closeGroupStudioModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-purple-500/50 rounded-3xl max-w-2xl w-full p-5 md:p-6 shadow-2xl space-y-4 glow-card max-h-[92vh] flex flex-col animate-fade-in">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-purple-500/30 shrink-0">
+            
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-100 flex items-center gap-2 mm-text">
+              <span>Studio Groups (အဖွဲ့လိုက် ပူးပေါင်းလုပ်ဆောင်ခြင်း)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mm-text">အဖွဲ့ဖွဲ့၍ Gmail ဖြင့် အဖွဲ့ဝင်များ ဖိတ်ခေါ်ပြီး Prompt & Script များကို အတူတကွ ဖန်တီးပါ</p>
+          </div>
+        </div>
+        <button onclick="closeGroupStudioModal()" class="text-slate-400 hover:text-slate-200 text-lg p-1.5 rounded-xl hover:bg-slate-800 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tab Navigation inside Group Modal -->
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-2.5">
+        <button type="button" onclick="switchGroupModalTab('list')" id="groupTabBtn-list" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-sm cursor-pointer mm-text">
+          <span> ကျွန်ုပ်၏ အဖွဲ့များ (My Groups)</span>
+        </button>
+        <button type="button" onclick="switchGroupModalTab('create')" id="groupTabBtn-create" class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-slate-200 cursor-pointer mm-text">
+          <span>➕ အဖွဲ့အသစ် ဖွဲ့စည်းမည် (Create Group)</span>
+        </button>
+      </div>
+
+      <!-- Tab Content 1: My Groups List & Management -->
+      <div id="groupModalContent-list" class="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-1 min-h-[280px]">
+        <!-- Populated via JS -->
+      </div>
+
+      <!-- Tab Content 2: Create New Group Form -->
+      <div id="groupModalContent-create" class="hidden flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-1">
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3.5">
+          <div>
+            <label class="block font-bold text-slate-200 text-xs mb-1 mm-text">အဖွဲ့အမည် (Group Name) *:</label>
+            <input type="text" id="newGroupNameInput" placeholder="ဥပမာ-  Studio Alpha Short Film Team" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500 mm-text">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-200 text-xs mb-1 mm-text">ဖော်ပြချက် (Description) [စိတ်ကြိုက်]:</label>
+            <textarea id="newGroupDescInput" rows="2" placeholder="ဥပမာ- ရုပ်ရှင်ဇာတ်လမ်းတွဲများ အတူတကွ ရေးသားထုတ်လုပ်မည့် အဖွဲ့" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-500 mm-text"></textarea>
+          </div>
+          <div class="pt-2">
+            <button type="button" onclick="handleCreateNewGroup()" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-purple-950/50 cursor-pointer mm-text flex items-center justify-center gap-2">
+              <span></span>
+              <span>အဖွဲ့အသစ် စတင်တည်ထောင်မည် (Create Group)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2 text-xs">
+        <span class="text-slate-500 font-mono text-[11px]"> CinePrompt Team Engine</span>
+        <button onclick="closeGroupStudioModal()" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold cursor-pointer mm-text">
+          ပိတ်မည် (Close)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- ⛔ SUSPENDED ACCOUNT STRICT LOCKDOWN MODAL -->
+  <!-- ======================================================== -->
+  <div id="suspendedAccountLockModal" class="fixed inset-0 modal-backdrop flex items-center justify-center p-4 z-[9999] hidden backdrop-blur-2xl bg-slate-950/95 animate-fade-in">
+    <div class="bg-[#111827] border-2 border-rose-600/80 rounded-3xl max-w-md w-full p-6 md:p-7 shadow-2xl space-y-4 text-center glow-card relative">
+      
+      <div class="w-16 h-16 rounded-2xl bg-rose-950/90 border-2 border-rose-500/60 flex items-center justify-center text-3xl mx-auto text-rose-400 shadow-xl shadow-rose-950/60 animate-bounce">
+        ⛔
+      </div>
+
+      <div class="space-y-1.5">
+        <h3 class="text-lg md:text-xl font-black text-rose-400 mm-text">
+          အကောင့် အသုံးပြုခွင့် ရပ်ဆိုင်းခံထားရပါသည်
+        </h3>
+        <div class="text-[11px] text-rose-300 font-mono font-bold bg-rose-950/80 border border-rose-800/80 py-1 px-3 rounded-full inline-block">
+          ACCOUNT SUSPENDED BY ADMIN
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-slate-900/90 border border-rose-900/40 text-xs text-slate-300 text-left space-y-2.5 mm-text">
+        <div class="flex items-center gap-2 text-rose-300 font-bold">
+          <span>️</span>
+          <span>အကောင့်အချက်အလက်:</span>
+        </div>
+        <div class="text-slate-400 font-mono text-[11px] space-y-1 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <div>အသုံးပြုသူ: <strong class="text-slate-200" id="suspendLockUserName">User</strong></div>
+          <div>အီးမေးလ်: <strong class="text-slate-200" id="suspendLockUserEmail">user@gmail.com</strong></div>
+          <div>အခြေအနေ: <span class="text-rose-400 font-bold">⛔ ရပ်ဆိုင်းထားသည် (Suspended)</span></div>
+        </div>
+        <p class="text-slate-400 text-xs pt-1">
+          သင်၏ အကောင့်အား စီမံခန့်ခွဲသူ (Super Admin) မှ လုံခြုံရေး သို့မဟုတ် သက်တမ်းကုန်ဆုံးမှုကြောင့် ယာယီ ရပ်ဆိုင်းထားပါသဖြင့် မည်သည့် Tool ကိုမျှ အသုံးပြုခွင့် မရှိသေးပါ။ ပြန်လည် အသုံးပြုလိုပါက Admin ထံ တိုက်ရိုက် ဆက်သွယ်ပေးပါခင်ဗျာ။
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2 pt-1">
+        <button onclick="openSubscriptionModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-slate-950 font-bold text-xs shadow-md shadow-amber-500/20 cursor-pointer mm-text flex items-center justify-center gap-2">
+          <span></span>
+          <span>Admin သို့ ဆက်သွယ်ရန် / သက်တမ်းတိုးရန်</span>
+        </button>
+        <button onclick="logoutUser(); closeSuspendedLockModal();" class="w-full py-2 rounded-xl bg-rose-950/80 hover:bg-rose-900 text-rose-200 border border-rose-700/60 font-bold text-xs cursor-pointer mm-text flex items-center justify-center gap-2">
+          <span></span>
+          <span>အကောင့်မှ ထွက်မည် (Logout)</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Logged-in User Profile Modal -->
+  <div id="userProfileModal" onclick="if(event.target===this) closeUserProfileModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-slate-700/80 rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4 glow-card animate-fade-in">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2 mm-text">
+          <span> User Profile (အကောင့်အချက်အလက်)</span>
+        </h3>
+        <button onclick="closeUserProfileModal()" class="text-slate-400 hover:text-slate-200 text-sm p-1 rounded-lg hover:bg-slate-800 cursor-pointer">✕</button>
+      </div>
+
+      <div class="text-center space-y-2 py-2">
+        <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-indigo-500/50 flex items-center justify-center text-3xl mx-auto shadow-inner" id="profileModalAvatar">
+          ‍
+        </div>
+        <div>
+          <div class="font-black text-slate-100 text-base" id="profileModalName">Creator</div>
+          <div class="text-xs text-indigo-300 font-mono" id="profileModalUsername">@user</div>
+          <div class="text-[11px] text-slate-400 font-mono" id="profileModalEmail">user@gmail.com</div>
+        </div>
+        <div class="pt-1">
+          <span id="profileModalRoleBadge" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700/60 font-mono">
+            Active Member
+          </span>
+        </div>
+        <div class="text-xs text-slate-300 mm-text pt-1" id="profileModalExpiry">
+          သက်တမ်း: ရက်ပေါင်း ၃၀ ကျန်ရှိပါသည်
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800 space-y-2 text-xs">
+        <button onclick="closeUserProfileModal(); openChangePasswordModal();" class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold flex items-center justify-center gap-1.5 cursor-pointer mm-text">
+          <span></span>
+          <span>Password ပြောင်းလဲရန် (Change Password)</span>
+        </button>
+        <button onclick="closeUserProfileModal(); openSubscriptionModal();" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 text-amber-300 border border-amber-500/50 font-bold flex items-center justify-center gap-1.5 cursor-pointer mm-text">
+          <span></span>
+          <span>လစဉ်ကြေး စစ်ဆေး / သက်တမ်းတိုးရန်</span>
+        </button>
+        <button onclick="logoutUser()" class="w-full py-2 px-3 rounded-xl bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/50 font-bold flex items-center justify-center gap-1.5 cursor-pointer mm-text">
+          <span></span>
+          <span>အကောင့်မှ ထွက်မည် (Logout)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt History Modal -->
+  <div id="historyModal" onclick="if(event.target===this) closeHistoryModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-slate-700/80 rounded-2xl max-w-3xl w-full p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col glow-card">
+      
+      <!-- Modal Header -->
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-base"></span>
+          <div>
+            <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+              <span>Prompt History (မှတ်တမ်းများ)</span>
+              <span id="historyUserTag" class="text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-normal">User: Default</span>
+            </h3>
+            <p class="text-xs text-slate-400">ယခင် ထုတ်လုပ်ခဲ့သော Video Prompts များကို ပြန်လည် ကြည့်ရှုအသုံးပြုနိုင်ပါသည်</p>
+          </div>
+        </div>
+        <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-200 p-1 text-lg">✕</button>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="flex items-center gap-2 text-xs">
+        <div class="relative flex-1">
+          <input type="text" id="historySearchInput" oninput="filterHistoryList()" placeholder="ခေါင်းစဉ် သို့မဟုတ် Genre ဖြင့် ရှာဖွေပါ..."
+            class="w-full bg-[#1e293b] border border-slate-700 rounded-xl pl-8 pr-3 py-2 text-slate-100 placeholder-slate-500 text-xs focus:border-indigo-500 focus:outline-none">
+          <span class="absolute left-2.5 top-2.5 text-slate-400"></span>
+        </div>
+        <button onclick="renderHistoryList()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+           Refresh
+        </button>
+      </div>
+
+      <!-- History List Container -->
+      <div id="historyListContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar min-h-[250px]">
+        <!-- Dynamic History Cards will be injected here -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-800 text-xs">
+        <div class="flex items-center gap-2">
+          <button onclick="exportAllHistory()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 font-semibold flex items-center gap-1.5">
+            <span></span>
+            <span>Export History (.JSON)</span>
+          </button>
+          <button onclick="confirmClearHistory()" class="px-3 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/50 font-medium">
+            <span>️ Clear All</span>
+          </button>
+        </div>
+        <button onclick="closeHistoryModal()" class="px-4 py-1.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
+          ပိတ်မည် (Close)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Live Audio Voice Preview Player Card (Strictly Hidden on startup) -->
+  <div id="audioPlayerWidget" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#111827]/95 border border-emerald-500/60 p-3.5 px-5 rounded-2xl shadow-2xl backdrop-blur-xl z-50 flex items-center gap-4 transition-all duration-300 transform translate-y-32 opacity-0 glow-card max-w-lg w-[92%] hidden">
+    <div class="w-10 h-10 rounded-xl bg-emerald-950/80 border border-emerald-500/50 flex items-center justify-center text-xl shrink-0" id="audioPlayerIcon">
+      ️
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-emerald-400 mm-text" id="audioPlayerTitle">Voice Over Preview</span>
+        <div class="flex items-center gap-1 h-5" id="audioEqualizer">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+      </div>
+      <p class="text-[11px] text-slate-300 truncate mm-text" id="audioPlayerSubtitle">အသံသွင်းဟန်ကို စတင်ဖွင့်ပြနေပါသည်...</p>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button onclick="stopVoiceAudio()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-400 text-xs font-bold border border-slate-700 transition-all mm-text cursor-pointer">
+        ⏹️ ရပ်မည် (Stop)
+      </button>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 pointer-events-none z-50">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <!-- User Monthly Subscription Modal (လစဉ်ကြေး ပေးသွင်းရန်) -->
+  <div id="subscriptionModal" onclick="if(event.target===this) closeSubscriptionModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#111827] border border-slate-700/80 rounded-2xl max-w-lg w-full p-5 md:p-6 shadow-2xl space-y-4 glow-card max-h-[92vh] flex flex-col animate-fade-in">
+      
+      <!-- Header -->
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/30 border border-amber-500/40 text-amber-300 flex items-center justify-center text-xl font-bold shadow-inner"></span>
+          <div>
+            <h3 class="text-base font-bold text-slate-100 flex items-center gap-1.5 mm-text">
+              <span>လစဉ်ကြေး ပေးသွင်းရန် (Monthly Subscription)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mm-text">AI Prompts & Full Features များကို ရက် ၃၀ အကန့်အသတ်မရှိ သုံးစွဲပါ</p>
+          </div>
+        </div>
+        <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-slate-200 p-1 text-sm rounded-lg hover:bg-slate-800 cursor-pointer" title="Close">✕</button>
+      </div>
+
+      <!-- Current User Status & Plan Display -->
+      <div class="space-y-3.5 text-xs flex-1 overflow-y-auto pr-1 custom-scrollbar">
+        
+        <!-- Status Box -->
+        <div id="subUserStatusBox" class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl" id="subModalAvatar"></span>
+            <div>
+              <div class="font-bold text-slate-200" id="subModalUserEmail">Guest User</div>
+              <div class="text-[11px] text-slate-400" id="subModalExpiryText">လက်ရှိ အခြေအနေ: Free Trial (အစမ်းသုံး)</div>
+            </div>
+          </div>
+          <span id="subModalStatusBadge" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700/60 font-mono">Trial</span>
+        </div>
+
+        <!-- Single Streamlined Monthly Plan Card -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/80 via-slate-900 to-purple-950/80 border border-indigo-500/50 shadow-xl space-y-3 relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-md bg-indigo-600 text-white font-bold text-[10px] uppercase tracking-wide">Standard Monthly</span>
+              <span class="text-xs text-indigo-300 font-semibold mm-text">၁ လ အပြည့် အသုံးပြုခွင့်</span>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-black text-amber-300 font-mono" id="subPlanPriceDisplay">20,000 MMK</div>
+              <div class="text-[10px] text-slate-400">/ ၃၀ ရက် (ရက်ပေါင်း ၃၀)</div>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-[11px] text-slate-200 border-t border-slate-800/80 pt-2.5 mm-text">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Kling, Sora, Runway, Flow Prompts:</strong> အကန့်အသတ်မရှိ (Unlimited) ထုတ်ယူခွင့်</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>ဇာတ်လမ်း & Screenplay Studio:</strong> အခန်းစဉ်အပြည့်အစုံ ရေးသားခွင့်</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Voiceover Audio Engine:</strong> စကားပြော အသံ ၉ မျိုး အစမ်းနားဆင်ခွင့်</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Character Studio:</strong> ဓါတ်ပုံတင်၍ ဇာတ်ကောင် စိတ်ကြိုက်ဖန်တီးခွင့်</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Accounts Box -->
+        <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+          <div class="font-bold text-amber-300 flex items-center gap-1.5 text-xs mm-text">
+            <span></span>
+            <span>ငွေလွှဲပေးပို့ရမည့် အကောင့်များ:</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+            <div class="p-2 rounded-lg bg-slate-950/80 border border-slate-800">
+              <div class="font-bold text-cyan-300"> KBZPay</div>
+              <div class="font-mono text-slate-200 font-semibold" id="kpayNumber">09-799887766</div>
+              <div class="text-[10px] text-slate-400" id="kpayName">Prompt Master Studio</div>
+            </div>
+            <div class="p-2 rounded-lg bg-slate-950/80 border border-slate-800">
+              <div class="font-bold text-amber-300"> WavePay</div>
+              <div class="font-mono text-slate-200 font-semibold" id="waveNumber">09-799887766</div>
+              <div class="text-[10px] text-slate-400" id="waveName">Prompt Master Studio</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slip Submission Form -->
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1 mm-text">ငွေလွှဲခဲ့သည့် နည်းလမ်း:</label>
+            <select id="subPayMethod" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-slate-200 text-xs focus:border-indigo-500 focus:outline-none mm-text">
+              <option value="KBZPay"> KBZPay (09-799887766)</option>
+              <option value="WavePay"> WavePay (09-799887766)</option>
+              <option value="CB Bank"> CB Bank Mobile Banking</option>
+              <option value="AYA Bank"> AYA Bank Mobile Banking</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1 mm-text">Transaction ID / ပြေစာ နံပါတ် (နောက်ဆုံး ဂဏန်းများ):</label>
+            <input type="text" id="subTxnInput" placeholder="ဥပမာ- 20260831004523 သို့မဟုတ် 4321" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none font-mono">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1 mm-text">မှတ်ချက် / အမည် (Optional):</label>
+            <input type="text" id="subNoteInput" placeholder="ဥပမာ- Ko Kyaw / 09-xxxxxxx" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-2 text-slate-100 text-xs focus:border-indigo-500 focus:outline-none mm-text">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+        <button onclick="closeSubscriptionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 mm-text cursor-pointer">
+          ပိတ်မည် (Close)
+        </button>
+        <button onclick="submitSubscriptionPayment()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-md shadow-amber-500/30 flex items-center gap-1.5 transition-all cursor-pointer mm-text">
+          <span>✅</span>
+          <span>ငွေလွှဲပြေစာ ပေးပို့အတည်ပြုမည်</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- End of Modals -->
+
+  <script src="app.js"></script>
+</body>
+</html>
