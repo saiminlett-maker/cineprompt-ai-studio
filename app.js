@@ -1723,18 +1723,55 @@ function closeSuspendedLockModal() {
 
 function showAuthGatewayModal() {
   const modal = document.getElementById('authGatewayModal');
+  const topNav = document.getElementById('topNavBarContainer');
+  const studioView = document.getElementById('userStudioView');
+  const adminDash = document.getElementById('adminFullScreenDashboard');
+
   if (modal) {
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
   }
+
+  // If user is not logged in and not currently exploring guest trial, cleanly isolate the Login Screen
+  const isGuestActive = sessionStorage.getItem('guest_trial_active') === 'true';
+  if (!state.isLoggedIn && !isGuestActive) {
+    if (topNav) topNav.classList.add('hidden');
+    if (studioView) studioView.classList.add('hidden');
+    if (adminDash) adminDash.classList.add('hidden');
+  }
+
+  // Lock body scroll so background page cannot move or jitter
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+
   hideAuthError();
 }
 
 function hideAuthGatewayModal() {
   const modal = document.getElementById('authGatewayModal');
+  const topNav = document.getElementById('topNavBarContainer');
+  const studioView = document.getElementById('userStudioView');
+  const adminDash = document.getElementById('adminFullScreenDashboard');
+
   if (modal) {
     modal.classList.add('hidden');
     modal.style.display = 'none';
+  }
+
+  // Unlock body scroll
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
+
+  // Show top navigation bar
+  if (topNav) topNav.classList.remove('hidden');
+
+  // Display the appropriate workspace view
+  if (state.isLoggedIn && state.user.role === 'superadmin') {
+    if (adminDash) adminDash.classList.remove('hidden');
+    if (studioView) studioView.classList.add('hidden');
+  } else {
+    if (studioView) studioView.classList.remove('hidden');
+    if (adminDash) adminDash.classList.add('hidden');
   }
 }
 
@@ -2198,11 +2235,13 @@ function logoutUser() {
   closeUserProfileModal();
   closeSubscriptionModal();
   updateUserProfileDisplay();
-  updateWorkspaceDisplay();
-  updateApiStatusBadge();
-  updateHistoryBadge();
+  // Clear input fields
+  const uInput = document.getElementById('authLoginUsername');
+  const pInput = document.getElementById('authLoginPassword');
+  if (uInput) uInput.value = '';
+  if (pInput) pInput.value = '';
 
-  // Return immediately to Auth Gateway Screen!
+  // Return immediately to Dedicated Auth Gateway Screen!
   showAuthGatewayModal();
   showToast("🚪 အကောင့်မှ ထွက်လိုက်ပါပြီ။");
 }

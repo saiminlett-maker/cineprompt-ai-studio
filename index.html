@@ -14,7 +14,7 @@
     
     <!-- Top Bar with Single-Action Tabs & Contextual Controls -->
     <!-- Top Navigation / Status Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/80 p-3 px-4.5 rounded-2xl border border-slate-800/90 backdrop-blur-xl shadow-lg">
+    <div id="topNavBarContainer" class="hidden flex flex-wrap items-center justify-between gap-3 mb-6 bg-slate-900/80 p-3 px-4.5 rounded-2xl border border-slate-800/90 backdrop-blur-xl shadow-lg">
       
       <!-- Left Side: Brand Mini Tag -->
       <div class="flex items-center gap-2.5">
@@ -102,8 +102,8 @@
       </div>
     </div>
 
-    <!-- USER STUDIO VIEW CONTAINER (Hidden when Super Admin logs in) -->
-    <div id="userStudioView" class="space-y-6">
+    <!-- USER STUDIO VIEW CONTAINER (Hidden when Super Admin logs in or unauthenticated) -->
+    <div id="userStudioView" class="hidden space-y-6">
       
       <!-- Free Trial Notification Banner (For Guests) -->
       <div id="trialBanner" class="max-w-3xl mx-auto mb-6 p-2.5 px-4 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs text-amber-200 flex flex-wrap items-center justify-between gap-2 shadow-lg animate-fade-in">
@@ -1634,11 +1634,11 @@
     </div>
   </div>
 
-  <!-- Dedicated Authentication & Login Gateway Modal -->
-  <div id="authGatewayModal" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50">
-    <div class="bg-[#111827] border border-indigo-500/40 rounded-2xl max-w-md w-full p-5 md:p-6 shadow-2xl space-y-3.5 glow-card max-h-[96vh] flex flex-col animate-fade-in relative">
+  <!-- Dedicated Standalone Authentication & Login Gateway Screen -->
+  <div id="authGatewayModal" class="fixed inset-0 z-[100] bg-[#0b0f19] flex items-center justify-center p-4 min-h-screen overflow-y-auto">
+    <div class="bg-[#111827] border border-indigo-500/40 rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl space-y-4 glow-card my-auto animate-fade-in relative">
       
-      <!-- Close Button (Allows closing modal anytime) -->
+      <!-- Close Button (Allows closing modal when guest/logged in) -->
       <button type="button" onclick="hideAuthGatewayModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition-all cursor-pointer z-10" title="ပိတ်မည်">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
