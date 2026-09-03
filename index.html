@@ -478,22 +478,22 @@
                     <!-- Name -->
                     <div class="space-y-1">
                       <label class="font-medium text-slate-300 mm-text">ဇာတ်ကောင် အမည် (Character Name)</label>
-                      <input type="text" id="customCharName" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - မင်းခန့်၊ ဖိုးထောင်၊ Alex" value="မင်းခန့်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                      <input type="text" id="customCharName" oninput="syncCharacterChangesAcrossUI()" placeholder="ဥပမာ - မင်းခန့်၊ ဖိုးထောင်၊ Alex" value="မင်းခန့်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
                     </div>
                     <!-- Role -->
                     <div class="space-y-1">
                       <label class="font-medium text-slate-300 mm-text">အခန်းကဏ္ဍ (Role / Archetype)</label>
-                      <input type="text" id="customCharRole" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - ပါရမီရှင် စုံထောက်၊ ရွာလူကြီး" value="ရဲရင့်သော စုံထောက်လူငယ်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                      <input type="text" id="customCharRole" oninput="syncCharacterChangesAcrossUI()" placeholder="ဥပမာ - ပါရမီရှင် စုံထောက်၊ ရွာလူကြီး" value="ရဲရင့်သော စုံထောက်လူငယ်" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
                     </div>
                     <!-- Appearance -->
                     <div class="space-y-1">
                       <label class="font-medium text-slate-300 mm-text">ရုပ်သွင်ပြင် / မျက်နှာ (Appearance & Face)</label>
-                      <input type="text" id="customCharAppearance" oninput="updateCharacterVoicePreviewBoard()" placeholder="ဥပမာ - အသက် ၂၅ နှစ်၊ ဆံပင်ကောက်၊ မျက်မှန်တပ်" value="အသက် ၂၅ နှစ်ခန့်၊ ဆံပင်တို၊ မျက်မှန်အဝိုင်းတပ်ထားသော သွက်လက်သည့် မျက်နှာထား" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                      <input type="text" id="customCharAppearance" oninput="syncCharacterChangesAcrossUI()" placeholder="ဥပမာ - အသက် ၂၅ နှစ်၊ ဆံပင်ကောက်၊ မျက်မှန်တပ်" value="အသက် ၂၅ နှစ်ခန့်၊ ဆံပင်တို၊ မျက်မှန်အဝိုင်းတပ်ထားသော သွက်လက်သည့် မျက်နှာထား" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
                     </div>
                     <!-- Costume -->
                     <div class="space-y-1">
                       <label class="font-medium text-slate-300 mm-text">ဝတ်စုံ / အဝတ်အစား (Costume & Style)</label>
-                      <input type="text" id="customCharCostume" placeholder="ဥပမာ - အညိုရောင် လည်ရှည်ဂျာကင်၊ ပုဆိုး" value="အညိုရောင် သားရေဂျာကင်၊ မီးခိုးရောင် တီရှပ်နှင့် ဂျင်းဘောင်းဘီ" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
+                      <input type="text" id="customCharCostume" oninput="syncCharacterChangesAcrossUI()" placeholder="ဥပမာ - အညိုရောင် လည်ရှည်ဂျာကင်၊ ပုဆိုး" value="အညိုရောင် သားရေဂျာကင်၊ မီးခိုးရောင် တီရှပ်နှင့် ဂျင်းဘောင်းဘီ" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:border-emerald-500 focus:outline-none mm-text">
                     </div>
                   </div>
                 </div>
@@ -504,7 +504,7 @@
                 <!-- Character Consistency -->
                 <div class="space-y-1">
                   <label class="font-medium text-slate-400 mm-text">Character Consistency (ဇာတ်ကောင်)</label>
-                  <select id="charConsistency" onchange="onCharConsistencyChange(); updateCharacterVoicePreviewBoard();" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                  <select id="charConsistency" onchange="onCharConsistencyChange(); syncCharacterChangesAcrossUI();" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
                     <option value="Fixed Character Seed (တသမတ်တည်း ဇာတ်ကောင်)" selected>🔒 Fixed Seed (တသမတ်တည်း)</option>
                     <option value="Custom Persona (စိတ်ကြိုက်ဖော်ပြချက်)">✨ Custom Persona (စိတ်ကြိုက်)</option>
                     <option value="2 Main Characters Duo (ဇာတ်ကောင် ၂ ယောက်အတွဲ)">👥 Duo Couple (၂ ယောက်အတွဲ)</option>
@@ -515,7 +515,7 @@
                 <!-- Naming Style -->
                 <div class="space-y-1">
                   <label class="font-medium text-slate-400 mm-text">Naming Style (အမည်ပေးပုံစံ)</label>
-                  <select id="namingStyle" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
+                  <select id="namingStyle" onchange="onNamingStyleChange();" class="w-full bg-[#1e293b]/90 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 focus:outline-none mm-text">
                     <option value="Modern (ခေတ်ဆန်ဆန်)" selected>🌟 Modern (ခေတ်ဆန် - မင်းခန့်)</option>
                     <option value="Funny / Village (ဟာသ/ရွာ - ကိုပေါက်စ၊ ဖိုးထောင်)">😂 Village (ဟာသ - ကိုပေါက်စ)</option>
                     <option value="Traditional Myanmar (ရိုးရာ - ဦးဘချစ်၊ မအေးသန်း)">🇲🇲 Traditional (ဦးဘချစ်)</option>

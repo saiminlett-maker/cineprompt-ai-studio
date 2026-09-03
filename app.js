@@ -668,7 +668,7 @@ function renderCharacterPreviewCards() {
     if (document.getElementById('customCharAppearance')) document.getElementById('customCharAppearance').value = firstChar.charAppearance;
   }
 
-  updateCharacterVoicePreviewBoard();
+  syncCharacterChangesAcrossUI();
 }
 
 function updateCharField(id, field, value) {
@@ -682,18 +682,20 @@ function updateCharField(id, field, value) {
       if (field === 'charAppearance' && document.getElementById('customCharAppearance')) document.getElementById('customCharAppearance').value = value;
     }
   }
-  updateCharacterVoicePreviewBoard();
+  syncCharacterChangesAcrossUI();
 }
 
 function removeUploadedImageById(id) {
   state.uploadedImages = state.uploadedImages.filter(item => item.id !== id);
   renderCharacterPreviewCards();
+  syncCharacterChangesAcrossUI();
   showToast("ဓါတ်ပုံကို ဖယ်ရှားလိုက်ပါပြီ");
 }
 
 function clearAllUploadedImages() {
   state.uploadedImages = [];
   renderCharacterPreviewCards();
+  syncCharacterChangesAcrossUI();
   showToast("တင်ထားသော ဓါတ်ပုံများ အားလုံးကို ရှင်းလင်းလိုက်ပါပြီ");
 }
 
@@ -705,7 +707,7 @@ function updateCharacterVoicePreviewBoard() {
   const lang = langSelect ? langSelect.value : 'Myanmar';
 
   // Mode 1: If Photo mode with uploaded images
-  if (state.charStudioEnabled && state.charStudioSubTab === 'photo' && state.uploadedImages.length > 0) {
+  if (state.uploadedImages && state.uploadedImages.length > 0) {
     grid.innerHTML = state.uploadedImages.map((img, idx) => {
       const vName = (img.charVoice || "Male Movie Narrator").split('(')[0].trim();
       return `
@@ -735,45 +737,26 @@ function updateCharacterVoicePreviewBoard() {
     return;
   }
 
-  // Mode 2: Presets / Text Mode or Duo Couple
-  const consistency = document.getElementById('charConsistency') ? document.getElementById('charConsistency').value : '';
-  const isDuo = consistency.includes('Duo') || consistency.includes('၂ ယောက်');
-  const mainName = (document.getElementById('customCharName') ? document.getElementById('customCharName').value.trim() : '') || 'မင်းခန့်';
-  const mainRole = (document.getElementById('customCharRole') ? document.getElementById('customCharRole').value.trim() : '') || 'ပါရမီရှင် စုံထောက်လူငယ်';
-  const mainVoice = document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : 'Male Movie Narrator';
-
-  let cards = [
-    {
-      avatar: '🕵️‍♂️',
-      name: mainName,
-      role: mainRole,
-      voice: mainVoice,
-      tag: 'Main Lead'
-    }
+  // Mode 2: Custom Text / Presets / Naming Style
+  const formParams = getFormValues();
+  const chars = formParams.characters && formParams.characters.length > 0 ? formParams.characters : [
+    { name: 'မင်းခန့်', role: 'ရဲရင့်သော စုံထောက်လူငယ်', voice: 'Male Movie Narrator' }
   ];
 
-  if (isDuo) {
-    cards.push({
-      avatar: '👴',
-      name: 'ဖိုးထောင်',
-      role: 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)',
-      voice: 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)',
-      tag: 'Sidekick'
-    });
-  }
-
-  grid.innerHTML = cards.map((c, idx) => {
-    const vName = c.voice.split('(')[0].trim();
+  grid.innerHTML = chars.map((c, idx) => {
+    const vName = (c.voice || "Male Movie Narrator").split('(')[0].trim();
+    const avatarIcon = idx === 0 ? '🕵️‍♂️' : (idx === 1 ? '👴' : '👤');
+    const tagText = idx === 0 ? 'Main Lead' : (idx === 1 ? 'Sidekick' : `Supporting #${idx + 1}`);
     return `
       <div class="bg-slate-900/90 border border-indigo-500/50 rounded-xl p-3 flex items-center justify-between gap-3 shadow-md hover:border-indigo-400 transition-all">
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="w-12 h-12 rounded-lg bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-2xl shrink-0">
-            ${c.avatar}
+            ${avatarIcon}
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5">
               <span class="text-xs font-bold text-white mm-text truncate">${escapeHtml(c.name)}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-800/60 font-mono">${c.tag}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-800/60 font-mono">${tagText}</span>
             </div>
             <div class="text-[10px] text-slate-300 mm-text truncate">${escapeHtml(c.role)}</div>
             <div class="text-[9px] text-emerald-300 font-mono flex items-center gap-1 mt-0.5">
@@ -783,7 +766,7 @@ function updateCharacterVoicePreviewBoard() {
           </div>
         </div>
 
-        <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', '${escapeHtml(c.voice)}', '${lang}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95">
+        <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', '${escapeHtml(c.voice || "Male Movie Narrator")}', '${lang}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95">
           <span class="animate-pulse">🔊</span>
           <span>Preview အသံ</span>
         </button>
@@ -1088,6 +1071,66 @@ const characterPresets = {
   }
 };
 
+function syncCharacterChangesAcrossUI() {
+  updateCharacterVoicePreviewBoard();
+  const draftTextarea = document.getElementById('expandedStoryDraft');
+  if (draftTextarea) {
+    const formParams = getFormValues();
+    draftTextarea.value = generateOfflineScreenplayDraft(formParams);
+  }
+}
+
+function onNamingStyleChange() {
+  const namingEl = document.getElementById('namingStyle');
+  const namingVal = namingEl ? namingEl.value : '';
+  const nameInput = document.getElementById('customCharName');
+  const roleInput = document.getElementById('customCharRole');
+  const appInput = document.getElementById('customCharAppearance');
+  const cosInput = document.getElementById('customCharCostume');
+
+  let newName = 'မင်းခန့်';
+  let newRole = 'ရဲရင့်သော စုံထောက်လူငယ်';
+  let newApp = 'အသက် ၂၆ နှစ်ခန့်၊ ဆံပင်တို၊ မျက်မှန်အဝိုင်းတပ်ထားသော သွက်လက်စူးရှသည့် မျက်နှာထား';
+  let newCos = 'အညိုရောင် သားရေဂျာကင်၊ မီးခိုးရောင် တီရှပ်နှင့် ဂျင်းဘောင်းဘီ';
+
+  if (namingVal.includes('Village') || namingVal.includes('ဟာသ') || namingVal.includes('ပေါက်စ')) {
+    newName = 'ဖိုးထောင်';
+    newRole = 'ရိုးသားပွင့်လင်းသော ရွာသားလူငယ်';
+    newApp = 'အသက် ၃၀ နှစ်ခန့်၊ အသားညို၊ သန်မာထွားကြိုင်းပြီး အမြဲပြုံးရွှင်နေတတ်သော မျက်နှာထား';
+    newCos = 'တောရိုးရာ ခေါင်းပေါင်း၊ တိုက်ပုံအင်္ကျီနှင့် မြန်မာ့ရိုးရာ ချည်ပုဆိုးကွက်';
+  } else if (namingVal.includes('Traditional') || namingVal.includes('ရိုးရာ') || namingVal.includes('ဘချစ်')) {
+    newName = 'ဦးဘချစ်';
+    newRole = 'တည်ကြည်လေးနက်သော မြန်မာ့ရိုးရာခေါင်းဆောင်';
+    newApp = 'အသက် ၄၅ နှစ်ခန့်၊ တည်ကြည်ခန့်ညားသော မျက်နှာထားနှင့် ခေါင်းပေါင်းဖြူ';
+    newCos = 'ပိုးတိုက်ပုံ အင်္ကျီဖြူနှင့် ပိုးပုဆိုး';
+  } else if (namingVal.includes('Cute') || namingVal.includes('ချစ်စနိုး') || namingVal.includes('မိုးမိုး')) {
+    newName = 'ဖိုးလပြည့်';
+    newRole = 'ချစ်စဖွယ် သွက်လက်သော ကလေးလူငယ်';
+    newApp = 'အသက် ၁၀ နှစ်ခန့်၊ ပါးဖောင်းဖောင်း၊ ချစ်စရာ ကလေးရုပ်သွင်';
+    newCos = 'ရောင်စုံ တီရှပ်နှင့် ဘောင်းဘီတို';
+  } else if (namingVal.includes('Western') || namingVal.includes('John') || namingVal.includes('Alex')) {
+    newName = 'Alex';
+    newRole = 'စွန့်စားခန်း စုံထောက်လူငယ် (Adventurer)';
+    newApp = 'အသက် ၂၈ နှစ်ခန့်၊ ဆံပင်ရွှေဝါရောင်၊ စူးရှသော မျက်ဝန်းပြာ';
+    newCos = 'စတိုင်ကျသော အနက်ရောင် ကုတ်အင်္ကျီနှင့် ရှပ်အင်္ကျီ';
+  }
+
+  if (nameInput) nameInput.value = newName;
+  if (roleInput) roleInput.value = newRole;
+  if (appInput) appInput.value = newApp;
+  if (cosInput) cosInput.value = newCos;
+
+  // If photo is uploaded, sync first image
+  if (state.uploadedImages && state.uploadedImages.length > 0) {
+    state.uploadedImages[0].charName = newName;
+    state.uploadedImages[0].charRole = newRole;
+    renderCharacterPreviewCards();
+  }
+
+  syncCharacterChangesAcrossUI();
+  showToast(`🏷️ Naming Style: "${namingVal.split('(')[0].trim()}" သို့ ပြောင်းလဲပြီး ဇာတ်ကောင် (${newName}) နှင့် ဇာတ်ညွှန်းကို ချိန်ညှိလိုက်ပါပြီ!`);
+}
+
 function applyCharacterPreset(presetKey) {
   const preset = characterPresets[presetKey];
   if (!preset) return;
@@ -1119,7 +1162,7 @@ function applyCharacterPreset(presetKey) {
     renderCharacterPreviewCards();
   }
 
-  updateCharacterVoicePreviewBoard();
+  syncCharacterChangesAcrossUI();
   showToast(`👤 ${preset.name} (${preset.role}) ဇာတ်ကောင် Preset ကို ရွေးချယ်လိုက်ပါပြီ!`);
 }
 
@@ -4745,39 +4788,77 @@ Include full dialogue lines, timestamps, camera atmosphere, and clear character 
 }
 
 function generateOfflineScreenplayDraft(params) {
-  const char1 = (params.characters && params.characters[0]) ? params.characters[0].name : "မင်းခန့်";
-  const char2 = (params.characters && params.characters[1]) ? params.characters[1].name : "ဖိုးထောင်";
-  const topic = params.topic || "ထူးဆန်းသော စွန့်စားခန်း ဇာတ်လမ်း";
+  const chars = (params && params.characters && params.characters.length > 0) ? params.characters : [
+    { name: "မင်းခန့်", role: "အဓိက ဇာတ်လိုက် (ရဲရင့်ပြီး သွက်လက်သူ)", voice: "Male Movie Narrator" },
+    { name: "ဖိုးထောင်", role: "တွဲဖက် ဇာတ်လိုက် (ဟာသဉာဏ်ရွှင်ပြီး ပွင့်လင်းသူ)", voice: "Village Voice" }
+  ];
+
+  const char1 = chars[0] ? chars[0].name : "မင်းခန့်";
+  const char2 = chars[1] ? chars[1].name : (chars.length > 1 ? chars[1].name : "");
+  const char3 = chars[2] ? chars[2].name : "";
+  const topic = (params && params.topic) ? params.topic : "ထူးဆန်းသော စွန့်စားခန်း ဇာတ်လမ်း";
+  const genre = (params && params.genre) ? params.genre : "Comedy";
+  const duration = (params && params.duration) ? params.duration : "3 Minutes";
+  const setting = (params && params.settingCulture) ? params.settingCulture : "Myanmar Modern City";
+  const lang = (params && params.language) ? params.language : "Myanmar";
+
+  // Build character roster list
+  const charListText = chars.map((c, i) => {
+    const roleText = c.role ? `: ${c.role}` : '';
+    const appText = c.appearance ? ` (${c.appearance})` : '';
+    return `${i + 1}. **${c.name}**${roleText}${appText}`;
+  }).join('\n');
+
+  // Build dialogues for Scene 1
+  let s1Dialogue = `**စကားပြော (Dialogue):**\n${char1}: "ဟေ့လူ... ကြည့်ကြစမ်းပါဦးဗျို့! ဒီနေ့တော့ အကြီးအကျယ် တစ်ခုခု ကြုံရတော့မယ်ဟေ့!"`;
+  if (char2) {
+    s1Dialogue += `\n${char2}: "အလိုလေး... ဟိုမှာ ဘာကြီးတုန်းဟ! သွားကြည့်ကြရအောင်..."`;
+  }
+  if (char3) {
+    s1Dialogue += `\n${char3}: "အားလုံး သတိထားကြနော်... မလွယ်ဘူးထင်တယ်!"`;
+  }
+
+  // Build dialogues for Scene 2
+  let s2Dialogue = `**စကားပြော (Dialogue):**\n${char1}: "မင်းတို့ သေချာကြည့်ပြီးမှ လုပ်ကြပါကွာ! အခုတော့ အကုန် တလွဲတွေ ဖြစ်ကုန်ပြီ!"`;
+  if (char2) {
+    s2Dialogue += `\n${char2}: "ငါ့အပြစ် မဟုတ်ဘူးနော်... ${char1} ပဲ အရင် စလုပ်တာလေ!"`;
+  }
+  if (char3) {
+    s2Dialogue += `\n${char3}: "ကဲပါ စကားများမနေကြနဲ့တော့... အတူတူ ရှင်းမှဖြစ်မယ်!"`;
+  }
+
+  // Build dialogues for Scene 3
+  let s3Dialogue = `**စကားပြော (Dialogue):**\n${char1}: "ဘယ်လိုပဲဖြစ်ဖြစ် ငါတို့ အားလုံး အတူတူ ကျော်ဖြတ်နိုင်ခဲ့တာပဲ မဟုတ်လား!"`;
+  if (char2) {
+    s2Dialogue += `\n${char2}: "ဒါပေါ့ကွ! နောက်တစ်ခါဆိုရင်တော့ ဒီထက်မိုက်အောင် လုပ်ကြတာပေါ့ ဟားဟား!"`;
+  }
+  if (char3) {
+    s3Dialogue += `\n${char3}: "အောင်ပွဲခံကြစို့ သူငယ်ချင်းတို့ရေ!"`;
+  }
 
   return `## ဇာတ်လမ်းခေါင်းစဉ်: ${topic}
-**အမျိုးအစား:** ${params.genre} (${params.duration})
+**အမျိုးအစား:** ${genre} (${duration})
+**ဘာသာစကား:** ${lang}
 
 ### 👥 ပါဝင်သော ဇာတ်ကောင်များ:
-1. **${char1}**: အဓိက ဇာတ်လိုက် (ရဲရင့်ပြီး သွက်လက်သူ)
-2. **${char2}**: တွဲဖက် ဇာတ်လိုက် (ဟာသဉာဏ်ရွှင်ပြီး ပွင့်လင်းသူ)
+${charListText}
 
 ---
 ### 🎬 အခန်းစဉ်အလိုက် ဇာတ်ညွှန်း အပြည့်အစုံ:
 
 ### **အခန်း (၁) : စတင်မိတ်ဆက်နှင့် အစပြုခြင်း (0:00 - 0:25)**
-**မြင်ကွင်း:** ${params.settingCulture} တွင် ${char1} နှင့် ${char2} တို့ ထူးဆန်းသော အခြေအနေတစ်ခုကို စတင်တွေ့ရှိခြင်း။
-**စကားပြော:**
-${char1}: "ဟေ့လူ... ကြည့်ကြစမ်းပါဦးဗျို့! ဒီနေ့တော့ အကြီးအကျယ် တစ်ခုခု ကြုံရတော့မယ်ဟေ့!"
-${char2}: "အလိုလေး... ဟိုမှာ ဘာကြီးတုန်းဟ! သွားကြည့်ကြရအောင်..."
-**အသံ/SFX:** စိတ်လှုပ်ရှားဖွယ် နောက်ခံတေးဂီတ၊ သဘာဝ ပတ်ဝန်းကျင် အသံများ။
+**မြင်ကွင်း:** ${setting} တွင် ${chars.map(c => c.name).join('၊ ')} တို့ ထူးဆန်းသော အခြေအနေတစ်ခုကို စတင်တွေ့ရှိခြင်း။
+${s1Dialogue}
+**အသံ/SFX:** စိတ်လှုပ်ရှားဖွယ် နောက်ခံတေးဂီတ၊ သဘာဝ ပတ်ဝန်းကျင် အသံများနှင့် ဇာတ်ဝင် အထူးပြုလုပ်ချက်များ။
 
 ### **အခန်း (၂) : အရှိန်တက်ခြင်းနှင့် ပြဿနာကြုံတွေ့ရခြင်း (0:25 - 1:00)**
-**မြင်ကွင်း:** ${char1} နှင့် ${char2} တို့ အငြင်းပွားပြီး ရယ်စရာ တလွဲများ စတင်ဖြစ်ပေါ်လာခြင်း။
-**စကားပြော:**
-${char1}: "မင်းကလည်း သေချာကြည့်ပြီးမှ လုပ်ပါကွာ! အခုတော့ အကုန် တလွဲတွေ ဖြစ်ကုန်ပြီ!"
-${char2}: "ငါ့အပြစ် မဟုတ်ဘူးနော်... မင်းပဲ အရင် စလုပ်တာလေ!"
-**အသံ/SFX:** ရယ်မောသံများနှင့် ဟာသဆန်ဆန် Sound Effects။
+**မြင်ကွင်း:** ${chars.map(c => c.name).join(' နှင့် ')} တို့ အငြင်းပွားပြီး ရယ်စရာ တလွဲများ စတင်ဖြစ်ပေါ်လာခြင်း။
+${s2Dialogue}
+**အသံ/SFX:** ရယ်မောသံများနှင့် ဟာသဆန်ဆန် Sound Effects များ။
 
 ### **အခန်း (၃) : အထွတ်အထိပ်နှင့် အောင်မြင်စွာ ဇာတ်သိမ်းခြင်း (1:00 - 3:00)**
-**မြင်ကွင်း:** သူငယ်ချင်းနှစ်ယောက် အတူတကွ ပူးပေါင်းဖြေရှင်းပြီး ပျော်ရွှင်စွာ အဆုံးသတ်သွားခြင်း။
-**စကားပြော:**
-${char1}: "ဘယ်လိုပဲဖြစ်ဖြစ် ငါတို့ အတူတူ ကျော်ဖြတ်နိုင်ခဲ့တာပဲ မဟုတ်လား သူငယ်ချင်း!"
-${char2}: "ဒါပေါ့ကွ! နောက်တစ်ခါဆိုရင်တော့ ဒီထက်မိုက်အောင် လုပ်ကြတာပေါ့ ဟားဟား!"
+**မြင်ကွင်း:** ဇာတ်ကောင်များ အတူတကွ ပူးပေါင်းဖြေရှင်းပြီး ပျော်ရွှင်စွာ အဆုံးသတ်သွားခြင်း။
+${s3Dialogue}
 **အသံ/SFX:** အောင်ပွဲခံ တေးဂီတသံစဉ် အဆုံးသတ် Fade out။`;
 }
 
@@ -4788,68 +4869,103 @@ ${char2}: "ဒါပေါ့ကွ! နောက်တစ်ခါဆိုရ�
 function getFormValues() {
   let characters = [];
   let customCharName = '';
-  
-  if (state.charStudioEnabled) {
-    if (state.charStudioSubTab === 'photo' && state.uploadedImages.length > 0) {
-      characters = state.uploadedImages.map(img => ({
-        name: (img.charName || 'Character').trim(),
-        role: (img.charRole || 'Main Role').trim(),
-        voice: (img.charVoice || 'Male Movie Narrator').trim(),
-        appearance: (img.charAppearance || '').trim(),
-        costume: (img.charCostume || '').trim()
-      }));
-      customCharName = characters[0] ? characters[0].name : '';
-    } else {
-      const consistency = document.getElementById('charConsistency') ? document.getElementById('charConsistency').value : '';
-      const isDuo = consistency.includes('Duo') || consistency.includes('၂ ယောက်');
-      const cName = document.getElementById('customCharName') ? document.getElementById('customCharName').value.trim() : 'မင်းခန့်';
-      const cRole = document.getElementById('customCharRole') ? document.getElementById('customCharRole').value.trim() : 'ပါရမီရှင် စုံထောက်လူငယ်';
-      const cVoice = document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : 'Male Movie Narrator';
-      const cApp = document.getElementById('customCharAppearance') ? document.getElementById('customCharAppearance').value.trim() : '';
-      const cCos = document.getElementById('customCharCostume') ? document.getElementById('customCharCostume').value.trim() : '';
-      
-      characters = [{
-        name: cName || 'မင်းခန့်',
-        role: cRole || 'ပါရမီရှင် စုံထောက်လူငယ်',
-        voice: cVoice,
-        appearance: cApp,
-        costume: cCos
-      }];
 
-      if (isDuo) {
-        characters.push({
-          name: 'ဖိုးထောင်',
-          role: 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)',
-          voice: 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)',
-          appearance: 'အသက် ၄၅ နှစ်ခန့်၊ ပုဆိုးနှင့် တိုက်ပုံ ဝတ်ဆင်ထားသော ရွာသား',
-          costume: 'ရိုးရာ ပုဆိုးနှင့် တီရှပ်'
-        });
-      }
-      customCharName = cName;
+  const consistency = document.getElementById('charConsistency') ? document.getElementById('charConsistency').value : '';
+  const isDuo = consistency.includes('Duo') || consistency.includes('၂ ယောက်');
+  const namingStyle = document.getElementById('namingStyle') ? document.getElementById('namingStyle').value : '';
+
+  // Priority 1: If Photo Characters are uploaded in Photo Studio
+  if (state.uploadedImages && state.uploadedImages.length > 0) {
+    characters = state.uploadedImages.map((img, idx) => ({
+      name: (img.charName || `ဇာတ်ကောင် #${idx + 1}`).trim(),
+      role: (img.charRole || (idx === 0 ? 'အဓိက ဇာတ်ဆောင်' : 'တွဲဖက် ဇာတ်ကောင်')).trim(),
+      voice: (img.charVoice || 'Male Movie Narrator').trim(),
+      appearance: (img.charAppearance || 'ဓာတ်ပုံအရည်အသွေးမြင့် ရုပ်သွင်ပြင်').trim(),
+      costume: (img.charCostume || '').trim(),
+      dataUrl: img.dataUrl || ''
+    }));
+    customCharName = characters[0] ? characters[0].name : '';
+  } else {
+    // Priority 2: Custom Text / Presets / Naming Style
+    const rawName = document.getElementById('customCharName') ? document.getElementById('customCharName').value.trim() : '';
+    const rawRole = document.getElementById('customCharRole') ? document.getElementById('customCharRole').value.trim() : '';
+    const rawApp = document.getElementById('customCharAppearance') ? document.getElementById('customCharAppearance').value.trim() : '';
+    const rawCos = document.getElementById('customCharCostume') ? document.getElementById('customCharCostume').value.trim() : '';
+    const cVoice = document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : 'Male Movie Narrator';
+
+    // Derive smart defaults from naming style
+    let defLead = 'မင်းခန့်';
+    let defLeadRole = 'ရဲရင့်သော စုံထောက်လူငယ်';
+    let defSidekick = 'ဖိုးထောင်';
+    let defSidekickRole = 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)';
+
+    if (namingStyle.includes('Village') || namingStyle.includes('ဟာသ') || namingStyle.includes('ပေါက်စ')) {
+      defLead = 'ဖိုးထောင်';
+      defLeadRole = 'ရိုးသားပွင့်လင်းသော ရွာသားလူငယ်';
+      defSidekick = 'ကိုပေါက်စ';
+      defSidekickRole = 'ဟာသဉာဏ်ရွှင်သော ရွာသားသူငယ်ချင်း';
+    } else if (namingStyle.includes('Traditional') || namingStyle.includes('ရိုးရာ') || namingStyle.includes('ဘချစ်')) {
+      defLead = 'ဦးဘချစ်';
+      defLeadRole = 'တည်ကြည်လေးနက်သော မြန်မာ့ရိုးရာခေါင်းဆောင်';
+      defSidekick = 'မအေးသန်း';
+      defSidekickRole = 'ယဉ်ကျေးသိမ်မွေ့သော ရိုးရာမယ်';
+    } else if (namingStyle.includes('Cute') || namingStyle.includes('ချစ်စနိုး') || namingStyle.includes('မိုးမိုး')) {
+      defLead = 'ဖိုးလပြည့်';
+      defLeadRole = 'ချစ်စဖွယ် သွက်လက်သော ကလေးလူငယ်';
+      defSidekick = 'မိုးမိုး';
+      defSidekickRole = 'ချိုသာပျော်ရွှင်သော သူငယ်ချင်းမလေး';
+    } else if (namingStyle.includes('Western') || namingStyle.includes('John') || namingStyle.includes('Alex')) {
+      defLead = 'Alex';
+      defLeadRole = 'စွန့်စားခန်း စုံထောက်လူငယ် (Adventurer)';
+      defSidekick = 'Emma';
+      defSidekickRole = 'ထက်မြက်သွက်လက်သော တွဲဖက်စုံထောက်';
     }
+
+    const cName = rawName || defLead;
+    const cRole = rawRole || defLeadRole;
+
+    characters = [{
+      name: cName,
+      role: cRole,
+      voice: cVoice,
+      appearance: rawApp || 'သွက်လက်ပြီး စူးရှသော မျက်နှာထားနှင့် သပ်ရပ်သော ရုပ်သွင်',
+      costume: rawCos || 'ဇာတ်ကောင်နှင့် လိုက်ဖက်သော ခေတ်မီဝတ်စုံ'
+    }];
+
+    if (isDuo) {
+      characters.push({
+        name: defSidekick,
+        role: defSidekickRole,
+        voice: 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)',
+        appearance: 'ဖော်ရွေပြီး အမြဲပြုံးရွှင်နေတတ်သော မျက်နှာထား',
+        costume: 'ရိုးရာ ပုဆိုးနှင့် တီရှပ်'
+      });
+    }
+
+    customCharName = cName;
   }
 
   return {
-    topic: document.getElementById('topicInput').value.trim() || 'Funny Village Adventure',
+    topic: document.getElementById('topicInput') ? document.getElementById('topicInput').value.trim() : 'Funny Village Adventure',
     videoFormat: document.getElementById('videoFormat') ? document.getElementById('videoFormat').value : 'Single Episode',
     videoFlow: document.getElementById('videoFlow') ? document.getElementById('videoFlow').value : 'Seamless Continuous Motion Flow',
     voiceOverPersona: document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : 'Male Movie Narrator (ယောက်ျားလေး ရုပ်ရှင်သံ)',
-    charConsistency: document.getElementById('charConsistency').value,
-    artStyle: document.getElementById('artStyle').value,
-    genre: document.getElementById('genre').value,
-    audioStyle: document.getElementById('audioStyle').value,
-    language: document.getElementById('language').value,
-    settingCulture: document.getElementById('settingCulture').value,
-    namingStyle: document.getElementById('namingStyle').value,
-    duration: document.getElementById('duration').value,
-    aspectRatio: document.getElementById('aspectRatio').value,
-    targetAI: document.getElementById('targetAI').value,
+    charConsistency: consistency,
+    artStyle: document.getElementById('artStyle') ? document.getElementById('artStyle').value : '3D Pixar',
+    genre: document.getElementById('genre') ? document.getElementById('genre').value : 'Comedy',
+    audioStyle: document.getElementById('audioStyle') ? document.getElementById('audioStyle').value : 'Character Speaking',
+    language: document.getElementById('language') ? document.getElementById('language').value : 'Myanmar',
+    settingCulture: document.getElementById('settingCulture') ? document.getElementById('settingCulture').value : 'Myanmar Modern City',
+    namingStyle: namingStyle,
+    duration: document.getElementById('duration') ? document.getElementById('duration').value : '3 Minutes',
+    aspectRatio: document.getElementById('aspectRatio') ? document.getElementById('aspectRatio').value : '16:9',
+    targetAI: document.getElementById('targetAI') ? document.getElementById('targetAI').value : 'Google Flow',
     expandStory: document.getElementById('expandStory') ? document.getElementById('expandStory').value : 'Yes',
     expandedStoryDraft: document.getElementById('expandedStoryDraft') ? document.getElementById('expandedStoryDraft').value.trim() : '',
     charStudioEnabled: state.charStudioEnabled,
     characters: characters,
     customCharName: customCharName,
-    hasUploadedImages: state.uploadedImages.length > 0
+    hasUploadedImages: (state.uploadedImages && state.uploadedImages.length > 0)
   };
 }
 
