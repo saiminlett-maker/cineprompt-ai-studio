@@ -699,6 +699,37 @@ function clearAllUploadedImages() {
   showToast("တင်ထားသော ဓါတ်ပုံများ အားလုံးကို ရှင်းလင်းလိုက်ပါပြီ");
 }
 
+const availableVoiceOptions = [
+  { value: "Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)", label: "🎙️ Male Movie (ရုပ်ရှင်သံ)" },
+  { value: "Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)", label: "🎙️ Female Sweet (ချိုသာသံ)" },
+  { value: "Energetic TikTok / Reels Host (လူငယ်ဆန်ဆန် သွက်လက်မြူးကြွသော အသံ)", label: "🎙️ Energetic Host (သွက်လက်သံ)" },
+  { value: "Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)", label: "🎙️ Village Uncle (ရွာအဘိုးကြီးသံ)" },
+  { value: "Comedic Village Auntie (ဟာသဆန်ဆန် စကားကြွယ် ရွာအဒေါ်ကြီး အသံ)", label: "🎙️ Village Auntie (ရွာအဒေါ်ကြီးသံ)" },
+  { value: "Mystery & Horror Suspense Whisper (သည်းထိတ်ရင်ဖို လျှို့ဝှက်ဆန်းကြယ် တီးတိုးသံ)", label: "🎙️ Mystery Whisper (တီးတိုးသံ)" },
+  { value: "Calm & Soft Documentary Narrator (အေးချမ်းငြိမ့်ညောင်းသော မှတ်တမ်းရုပ်ရှင်သံ)", label: "🎙️ Calm Documentary (ငြိမ့်ညောင်းသံ)" },
+  { value: "Cute Anime Kid / Cartoon Character (ကလေးချစ်စရာ ကာတွန်းဇာတ်ကောင် အသံ)", label: "🎙️ Cute Cartoon (ကာတွန်းသံ)" },
+  { value: "Professional Broadcaster / News Host (သတင်းကြေညာသူ ဆန်ဆန် တိကျသေသပ်သော အသံ)", label: "🎙️ News Broadcaster (သတင်းသံ)" }
+];
+
+function updateCharacterVoice(index, newVoice) {
+  if (state.uploadedImages && state.uploadedImages.length > index) {
+    state.uploadedImages[index].charVoice = newVoice;
+  }
+  if (index === 0) {
+    state.character1Voice = newVoice;
+    const vMain = document.getElementById('voiceOverPersona');
+    if (vMain) vMain.value = newVoice;
+  } else if (index === 1) {
+    state.character2Voice = newVoice;
+  }
+
+  syncCharacterChangesAcrossUI();
+  const formParams = getFormValues();
+  const char = (formParams.characters && formParams.characters[index]) ? formParams.characters[index] : null;
+  const charName = char ? char.name : `ဇာတ်ကောင် #${index + 1}`;
+  showToast(`🎙️ "${charName}" ၏ သီးသန့်အသံကို "${newVoice.split('(')[0].trim()}" သို့ ပြောင်းလဲသတ်မှတ်လိုက်ပါပြီ!`);
+}
+
 function updateCharacterVoicePreviewBoard() {
   const grid = document.getElementById('characterVoiceCardsGrid');
   if (!grid) return;
@@ -706,70 +737,56 @@ function updateCharacterVoicePreviewBoard() {
   const langSelect = document.getElementById('language');
   const lang = langSelect ? langSelect.value : 'Myanmar';
 
-  // Mode 1: If Photo mode with uploaded images
-  if (state.uploadedImages && state.uploadedImages.length > 0) {
-    grid.innerHTML = state.uploadedImages.map((img, idx) => {
-      const vName = (img.charVoice || "Male Movie Narrator").split('(')[0].trim();
-      return `
-        <div class="bg-slate-900/90 border border-indigo-500/50 rounded-xl p-3 flex items-center justify-between gap-3 shadow-md hover:border-indigo-400 transition-all">
+  const formParams = getFormValues();
+  const chars = (formParams && formParams.characters && formParams.characters.length > 0) ? formParams.characters : [
+    { name: 'မင်းခန့်', role: 'ရဲရင့်သော စုံထောက်လူငယ်', voice: 'Male Movie Narrator (ယောက်ျားလေး ရုပ်ရှင်သံ)' },
+    { name: 'ဖိုးထောင်', role: 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)', voice: 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)' }
+  ];
+
+  grid.innerHTML = chars.map((c, idx) => {
+    const currentVoice = c.voice || (idx === 0 ? "Male Movie Narrator" : "Female Sweet Storyteller");
+    const avatarIcon = (c.dataUrl) 
+      ? `<img src="${c.dataUrl}" alt="${escapeHtml(c.name)}" class="w-12 h-12 object-cover rounded-xl border-2 border-indigo-500/70 shrink-0 shadow-md">`
+      : `<div class="w-12 h-12 rounded-xl bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-2xl shrink-0 shadow-md">${idx === 0 ? '🕵️‍♂️' : (idx === 1 ? '👴' : '👤')}</div>`;
+    
+    const tagText = idx === 0 ? 'Main Lead (ဇာတ်ကောင် ၁)' : (idx === 1 ? 'Partner / Sidekick (ဇာတ်ကောင် ၂)' : `Supporting #${idx + 1}`);
+    const badgeStyle = idx === 0 ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60' : 'bg-purple-950 text-purple-300 border border-purple-800/60';
+
+    const voiceOptionsHtml = availableVoiceOptions.map(v => {
+      const isSelected = (currentVoice.toLowerCase().includes(v.value.split('(')[0].trim().toLowerCase()) || currentVoice === v.value) ? 'selected' : '';
+      return `<option value="${escapeHtml(v.value)}" ${isSelected}>${escapeHtml(v.label)}</option>`;
+    }).join('');
+
+    return `
+      <div class="bg-slate-900/90 border border-indigo-500/50 rounded-2xl p-3.5 space-y-2.5 shadow-lg hover:border-indigo-400 transition-all flex flex-col justify-between animate-fade-in">
+        <div class="flex items-center justify-between gap-2.5">
           <div class="flex items-center gap-2.5 min-w-0">
-            <img src="${img.dataUrl}" alt="${escapeHtml(img.charName)}" class="w-12 h-12 object-cover rounded-lg border-2 border-indigo-500/70 shrink-0">
+            ${avatarIcon}
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-white mm-text truncate">${escapeHtml(img.charName || `ဇာတ်ကောင် #${idx+1}`)}</span>
-                <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-mono">#${idx+1}</span>
+                <span class="text-xs font-bold text-white mm-text truncate">${escapeHtml(c.name)}</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded ${badgeStyle} font-mono font-bold">${tagText}</span>
               </div>
-              <div class="text-[10px] text-slate-300 mm-text truncate">${escapeHtml(img.charRole || 'အဓိက ဇာတ်ကောင်')}</div>
-              <div class="text-[9px] text-emerald-300 font-mono flex items-center gap-1 mt-0.5">
-                <span>🎙️</span>
-                <span class="truncate">${escapeHtml(vName)}</span>
-              </div>
+              <div class="text-[10px] text-slate-300 mm-text truncate">${escapeHtml(c.role || 'ဇာတ်ကောင်')}</div>
             </div>
           </div>
 
-          <button type="button" onclick="previewCharacterVoice('${escapeHtml(img.charName)}', '${escapeHtml(img.charRole)}', '${escapeHtml(img.charVoice || "Male Movie Narrator")}', '${lang}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95">
+          <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', document.getElementById('charVoiceSelect_${idx}') ? document.getElementById('charVoiceSelect_${idx}').value : '${escapeHtml(currentVoice)}', '${lang}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95" title="${escapeHtml(c.name)} ၏ သီးသန့် အသံကို စမ်းသပ်နားထောင်ရန်">
             <span class="animate-pulse">🔊</span>
             <span>Preview အသံ</span>
           </button>
         </div>
-      `;
-    }).join('');
-    return;
-  }
 
-  // Mode 2: Custom Text / Presets / Naming Style
-  const formParams = getFormValues();
-  const chars = formParams.characters && formParams.characters.length > 0 ? formParams.characters : [
-    { name: 'မင်းခန့်', role: 'ရဲရင့်သော စုံထောက်လူငယ်', voice: 'Male Movie Narrator' }
-  ];
-
-  grid.innerHTML = chars.map((c, idx) => {
-    const vName = (c.voice || "Male Movie Narrator").split('(')[0].trim();
-    const avatarIcon = idx === 0 ? '🕵️‍♂️' : (idx === 1 ? '👴' : '👤');
-    const tagText = idx === 0 ? 'Main Lead' : (idx === 1 ? 'Sidekick' : `Supporting #${idx + 1}`);
-    return `
-      <div class="bg-slate-900/90 border border-indigo-500/50 rounded-xl p-3 flex items-center justify-between gap-3 shadow-md hover:border-indigo-400 transition-all">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-12 h-12 rounded-lg bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-2xl shrink-0">
-            ${avatarIcon}
+        <div class="pt-2 border-t border-slate-800">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[10px] font-bold text-emerald-300 mm-text flex items-center gap-1">
+              <span>🎙️ ဇာတ်ကောင် #${idx + 1} သီးသန့် အသံ (Voice):</span>
+            </label>
           </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs font-bold text-white mm-text truncate">${escapeHtml(c.name)}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 border border-purple-800/60 font-mono">${tagText}</span>
-            </div>
-            <div class="text-[10px] text-slate-300 mm-text truncate">${escapeHtml(c.role)}</div>
-            <div class="text-[9px] text-emerald-300 font-mono flex items-center gap-1 mt-0.5">
-              <span>🎙️</span>
-              <span class="truncate">${escapeHtml(vName)}</span>
-            </div>
-          </div>
+          <select id="charVoiceSelect_${idx}" onchange="updateCharacterVoice(${idx}, this.value)" class="w-full bg-[#111827] border border-emerald-600/50 rounded-lg px-2.5 py-1.5 text-xs text-emerald-100 focus:border-emerald-400 focus:outline-none mm-text cursor-pointer">
+            ${voiceOptionsHtml}
+          </select>
         </div>
-
-        <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', '${escapeHtml(c.voice || "Male Movie Narrator")}', '${lang}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95">
-          <span class="animate-pulse">🔊</span>
-          <span>Preview အသံ</span>
-        </button>
       </div>
     `;
   }).join('');
@@ -1092,28 +1109,44 @@ function onNamingStyleChange() {
   let newRole = 'ရဲရင့်သော စုံထောက်လူငယ်';
   let newApp = 'အသက် ၂၆ နှစ်ခန့်၊ ဆံပင်တို၊ မျက်မှန်အဝိုင်းတပ်ထားသော သွက်လက်စူးရှသည့် မျက်နှာထား';
   let newCos = 'အညိုရောင် သားရေဂျာကင်၊ မီးခိုးရောင် တီရှပ်နှင့် ဂျင်းဘောင်းဘီ';
+  let voice1 = "Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)";
+  let voice2 = "Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)";
 
   if (namingVal.includes('Village') || namingVal.includes('ဟာသ') || namingVal.includes('ပေါက်စ')) {
     newName = 'ဖိုးထောင်';
     newRole = 'ရိုးသားပွင့်လင်းသော ရွာသားလူငယ်';
     newApp = 'အသက် ၃၀ နှစ်ခန့်၊ အသားညို၊ သန်မာထွားကြိုင်းပြီး အမြဲပြုံးရွှင်နေတတ်သော မျက်နှာထား';
     newCos = 'တောရိုးရာ ခေါင်းပေါင်း၊ တိုက်ပုံအင်္ကျီနှင့် မြန်မာ့ရိုးရာ ချည်ပုဆိုးကွက်';
+    voice1 = "Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)";
+    voice2 = "Energetic TikTok / Reels Host (လူငယ်ဆန်ဆန် သွက်လက်မြူးကြွသော အသံ)";
   } else if (namingVal.includes('Traditional') || namingVal.includes('ရိုးရာ') || namingVal.includes('ဘချစ်')) {
     newName = 'ဦးဘချစ်';
     newRole = 'တည်ကြည်လေးနက်သော မြန်မာ့ရိုးရာခေါင်းဆောင်';
     newApp = 'အသက် ၄၅ နှစ်ခန့်၊ တည်ကြည်ခန့်ညားသော မျက်နှာထားနှင့် ခေါင်းပေါင်းဖြူ';
     newCos = 'ပိုးတိုက်ပုံ အင်္ကျီဖြူနှင့် ပိုးပုဆိုး';
-  } else if (namingVal.includes('Cute') || namingVal.includes('ချစ်စနိုး') || namingVal.includes('မိုးမိုး')) {
+    voice1 = "Calm & Soft Documentary Narrator (အေးချမ်းငြိမ့်ညောင်းသော မှတ်တမ်းရုပ်ရှင်သံ)";
+    voice2 = "Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)";
+  } else if (namingVal.includes('Cute') || namingVal.includes('ချစ်စနိုး') || namingVal.includes('မိုးမိုး') || namingVal.includes('လပြည့်')) {
     newName = 'ဖိုးလပြည့်';
     newRole = 'ချစ်စဖွယ် သွက်လက်သော ကလေးလူငယ်';
     newApp = 'အသက် ၁၀ နှစ်ခန့်၊ ပါးဖောင်းဖောင်း၊ ချစ်စရာ ကလေးရုပ်သွင်';
     newCos = 'ရောင်စုံ တီရှပ်နှင့် ဘောင်းဘီတို';
+    voice1 = "Cute Anime Kid / Cartoon Character (ကလေးချစ်စရာ ကာတွန်းဇာတ်ကောင် အသံ)";
+    voice2 = "Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)";
   } else if (namingVal.includes('Western') || namingVal.includes('John') || namingVal.includes('Alex')) {
     newName = 'Alex';
     newRole = 'စွန့်စားခန်း စုံထောက်လူငယ် (Adventurer)';
     newApp = 'အသက် ၂၈ နှစ်ခန့်၊ ဆံပင်ရွှေဝါရောင်၊ စူးရှသော မျက်ဝန်းပြာ';
     newCos = 'စတိုင်ကျသော အနက်ရောင် ကုတ်အင်္ကျီနှင့် ရှပ်အင်္ကျီ';
+    voice1 = "Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)";
+    voice2 = "Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)";
   }
+
+  state.character1Voice = voice1;
+  state.character2Voice = voice2;
+
+  const vMain = document.getElementById('voiceOverPersona');
+  if (vMain) vMain.value = voice1;
 
   if (nameInput) nameInput.value = newName;
   if (roleInput) roleInput.value = newRole;
@@ -1124,6 +1157,10 @@ function onNamingStyleChange() {
   if (state.uploadedImages && state.uploadedImages.length > 0) {
     state.uploadedImages[0].charName = newName;
     state.uploadedImages[0].charRole = newRole;
+    state.uploadedImages[0].charVoice = voice1;
+    if (state.uploadedImages.length > 1) {
+      state.uploadedImages[1].charVoice = voice2;
+    }
     renderCharacterPreviewCards();
   }
 
@@ -4871,76 +4908,97 @@ function getFormValues() {
   let customCharName = '';
 
   const consistency = document.getElementById('charConsistency') ? document.getElementById('charConsistency').value : '';
-  const isDuo = consistency.includes('Duo') || consistency.includes('၂ ယောက်');
   const namingStyle = document.getElementById('namingStyle') ? document.getElementById('namingStyle').value : '';
+
+  // Derive smart defaults and distinct voices from naming style
+  let defLead = 'မင်းခန့်';
+  let defLeadRole = 'ရဲရင့်သော စုံထောက်လူငယ်';
+  let defLeadVoice = 'Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)';
+  let defSidekick = 'ဖိုးထောင်';
+  let defSidekickRole = 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)';
+  let defSidekickVoice = 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)';
+
+  if (namingStyle.includes('Village') || namingStyle.includes('ဟာသ') || namingStyle.includes('ပေါက်စ')) {
+    defLead = 'ဖိုးထောင်';
+    defLeadRole = 'ရိုးသားပွင့်လင်းသော ရွာသားလူငယ်';
+    defLeadVoice = 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)';
+    defSidekick = 'ကိုပေါက်စ';
+    defSidekickRole = 'ဟာသဉာဏ်ရွှင်သော ရွာသားသူငယ်ချင်း';
+    defSidekickVoice = 'Energetic TikTok / Reels Host (လူငယ်ဆန်ဆန် သွက်လက်မြူးကြွသော အသံ)';
+  } else if (namingStyle.includes('Traditional') || namingStyle.includes('ရိုးရာ') || namingStyle.includes('ဘချစ်')) {
+    defLead = 'ဦးဘချစ်';
+    defLeadRole = 'တည်ကြည်လေးနက်သော မြန်မာ့ရိုးရာခေါင်းဆောင်';
+    defLeadVoice = 'Calm & Soft Documentary Narrator (အေးချမ်းငြိမ့်ညောင်းသော မှတ်တမ်းရုပ်ရှင်သံ)';
+    defSidekick = 'မအေးသန်း';
+    defSidekickRole = 'ယဉ်ကျေးသိမ်မွေ့သော ရိုးရာမယ်';
+    defSidekickVoice = 'Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)';
+  } else if (namingStyle.includes('Cute') || namingStyle.includes('ချစ်စနိုး') || namingStyle.includes('မိုးမိုး') || namingStyle.includes('လပြည့်')) {
+    defLead = 'ဖိုးလပြည့်';
+    defLeadRole = 'ချစ်စဖွယ် သွက်လက်သော ကလေးလူငယ်';
+    defLeadVoice = 'Cute Anime Kid / Cartoon Character (ကလေးချစ်စရာ ကာတွန်းဇာတ်ကောင် အသံ)';
+    defSidekick = 'မိုးမိုး';
+    defSidekickRole = 'ချိုသာပျော်ရွှင်သော သူငယ်ချင်းမလေး';
+    defSidekickVoice = 'Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)';
+  } else if (namingStyle.includes('Western') || namingStyle.includes('John') || namingStyle.includes('Alex')) {
+    defLead = 'Alex';
+    defLeadRole = 'စွန့်စားခန်း စုံထောက်လူငယ် (Adventurer)';
+    defLeadVoice = 'Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)';
+    defSidekick = 'Emma';
+    defSidekickRole = 'ထက်မြက်သွက်လက်သော တွဲဖက်စုံထောက်';
+    defSidekickVoice = 'Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)';
+  }
 
   // Priority 1: If Photo Characters are uploaded in Photo Studio
   if (state.uploadedImages && state.uploadedImages.length > 0) {
     characters = state.uploadedImages.map((img, idx) => ({
       name: (img.charName || `ဇာတ်ကောင် #${idx + 1}`).trim(),
       role: (img.charRole || (idx === 0 ? 'အဓိက ဇာတ်ဆောင်' : 'တွဲဖက် ဇာတ်ကောင်')).trim(),
-      voice: (img.charVoice || 'Male Movie Narrator').trim(),
+      voice: (img.charVoice || (idx === 0 ? defLeadVoice : defSidekickVoice)).trim(),
       appearance: (img.charAppearance || 'ဓာတ်ပုံအရည်အသွေးမြင့် ရုပ်သွင်ပြင်').trim(),
       costume: (img.charCostume || '').trim(),
       dataUrl: img.dataUrl || ''
     }));
+
+    // If only 1 photo was uploaded, provide Character 2 with Voice 2 as well
+    if (characters.length === 1) {
+      characters.push({
+        name: defSidekick,
+        role: defSidekickRole,
+        voice: state.character2Voice || defSidekickVoice,
+        appearance: 'ဖော်ရွေပြီး အမြဲပြုံးရွှင်နေတတ်သော မျက်နှာထား',
+        costume: 'ဇာတ်ကောင်နှင့် လိုက်ဖက်သော ဝတ်စုံ'
+      });
+    }
+
     customCharName = characters[0] ? characters[0].name : '';
   } else {
-    // Priority 2: Custom Text / Presets / Naming Style
+    // Priority 2: Custom Text / Presets / Naming Style (Always 2 Characters with 2 Distinct Voices!)
     const rawName = document.getElementById('customCharName') ? document.getElementById('customCharName').value.trim() : '';
     const rawRole = document.getElementById('customCharRole') ? document.getElementById('customCharRole').value.trim() : '';
     const rawApp = document.getElementById('customCharAppearance') ? document.getElementById('customCharAppearance').value.trim() : '';
     const rawCos = document.getElementById('customCharCostume') ? document.getElementById('customCharCostume').value.trim() : '';
-    const cVoice = document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : 'Male Movie Narrator';
-
-    // Derive smart defaults from naming style
-    let defLead = 'မင်းခန့်';
-    let defLeadRole = 'ရဲရင့်သော စုံထောက်လူငယ်';
-    let defSidekick = 'ဖိုးထောင်';
-    let defSidekickRole = 'တွဲဖက်ဇာတ်လိုက် (ရွာသားလူရွှင်တော်)';
-
-    if (namingStyle.includes('Village') || namingStyle.includes('ဟာသ') || namingStyle.includes('ပေါက်စ')) {
-      defLead = 'ဖိုးထောင်';
-      defLeadRole = 'ရိုးသားပွင့်လင်းသော ရွာသားလူငယ်';
-      defSidekick = 'ကိုပေါက်စ';
-      defSidekickRole = 'ဟာသဉာဏ်ရွှင်သော ရွာသားသူငယ်ချင်း';
-    } else if (namingStyle.includes('Traditional') || namingStyle.includes('ရိုးရာ') || namingStyle.includes('ဘချစ်')) {
-      defLead = 'ဦးဘချစ်';
-      defLeadRole = 'တည်ကြည်လေးနက်သော မြန်မာ့ရိုးရာခေါင်းဆောင်';
-      defSidekick = 'မအေးသန်း';
-      defSidekickRole = 'ယဉ်ကျေးသိမ်မွေ့သော ရိုးရာမယ်';
-    } else if (namingStyle.includes('Cute') || namingStyle.includes('ချစ်စနိုး') || namingStyle.includes('မိုးမိုး')) {
-      defLead = 'ဖိုးလပြည့်';
-      defLeadRole = 'ချစ်စဖွယ် သွက်လက်သော ကလေးလူငယ်';
-      defSidekick = 'မိုးမိုး';
-      defSidekickRole = 'ချိုသာပျော်ရွှင်သော သူငယ်ချင်းမလေး';
-    } else if (namingStyle.includes('Western') || namingStyle.includes('John') || namingStyle.includes('Alex')) {
-      defLead = 'Alex';
-      defLeadRole = 'စွန့်စားခန်း စုံထောက်လူငယ် (Adventurer)';
-      defSidekick = 'Emma';
-      defSidekickRole = 'ထက်မြက်သွက်လက်သော တွဲဖက်စုံထောက်';
-    }
+    const cVoice1 = state.character1Voice || (document.getElementById('voiceOverPersona') ? document.getElementById('voiceOverPersona').value : defLeadVoice);
+    const cVoice2 = state.character2Voice || defSidekickVoice;
 
     const cName = rawName || defLead;
     const cRole = rawRole || defLeadRole;
 
-    characters = [{
-      name: cName,
-      role: cRole,
-      voice: cVoice,
-      appearance: rawApp || 'သွက်လက်ပြီး စူးရှသော မျက်နှာထားနှင့် သပ်ရပ်သော ရုပ်သွင်',
-      costume: rawCos || 'ဇာတ်ကောင်နှင့် လိုက်ဖက်သော ခေတ်မီဝတ်စုံ'
-    }];
-
-    if (isDuo) {
-      characters.push({
+    characters = [
+      {
+        name: cName,
+        role: cRole,
+        voice: cVoice1,
+        appearance: rawApp || 'သွက်လက်ပြီး စူးရှသော မျက်နှာထားနှင့် သပ်ရပ်သော ရုပ်သွင်',
+        costume: rawCos || 'ဇာတ်ကောင်နှင့် လိုက်ဖက်သော ခေတ်မီဝတ်စုံ'
+      },
+      {
         name: defSidekick,
         role: defSidekickRole,
-        voice: 'Comedic Myanmar Village Uncle (ဟာသဆန်ဆန် ကျေးလက်အဘိုးကြီး/ကိုကြီး အသံ)',
+        voice: cVoice2,
         appearance: 'ဖော်ရွေပြီး အမြဲပြုံးရွှင်နေတတ်သော မျက်နှာထား',
         costume: 'ရိုးရာ ပုဆိုးနှင့် တီရှပ်'
-      });
-    }
+      }
+    ];
 
     customCharName = cName;
   }
