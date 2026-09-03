@@ -532,7 +532,13 @@
                     <span class="text-base">🎭</span>
                     <h4 class="text-xs font-bold text-indigo-200 mm-text">Character Preview & Voice Audition (ဇာတ်ကောင် & အသံ ကြည့်ရှုစစ်ဆေးရန်)</h4>
                   </div>
-                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/50 font-mono font-bold">Interactive Audio & Look</span>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="openCharacterReviewModal(0)" class="px-2.5 py-1 rounded-lg bg-indigo-600/90 hover:bg-indigo-500 text-white font-bold text-[11px] flex items-center gap-1.5 transition-all shadow cursor-pointer mm-text">
+                      <span>🔍</span>
+                      <span>Review ဇာတ်ကောင် စစ်ဆေးမည်</span>
+                    </button>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/50 font-mono font-bold hidden sm:inline-block">Interactive Audio & Look</span>
+                  </div>
                 </div>
 
                 <p class="text-[11px] text-slate-400 mm-text">
@@ -2201,6 +2207,54 @@
           <span>✅</span>
           <span>ငွေလွှဲပြေစာ ပေးပို့အတည်ပြုမည်</span>
         </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 🎭 CHARACTER REVIEW & DOSSIER MODAL (ဇာတ်ကောင် အသေးစိတ် စစ်ဆေးခြင်း) -->
+  <div id="characterReviewModal" onclick="if(event.target===this) closeCharacterReviewModal()" class="fixed inset-0 modal-backdrop flex items-center justify-center p-3 md:p-4 z-50 hidden">
+    <div class="bg-[#0f172a] border border-indigo-500/60 rounded-3xl max-w-3xl w-full p-5 md:p-6 shadow-2xl space-y-4 glow-card max-h-[92vh] flex flex-col animate-fade-in">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-indigo-900/60 pb-3">
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-2xl bg-indigo-950 border border-indigo-500/50 text-indigo-300 flex items-center justify-center text-xl shadow-inner shrink-0">🎭</span>
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2 mm-text">
+              <span>ဇာတ်ကောင် အသေးစိတ် စစ်ဆေးခြင်း (Character Review & Dossier)</span>
+            </h3>
+            <p class="text-xs text-indigo-300/80 mm-text">ဇာတ်ကောင်၏ ရုပ်သွင်၊ ဝတ်စုံ၊ ကျား/မ၊ သီးသန့်အသံနှင့် AI Prompts များကို စစ်ဆေးပြင်ဆင်ပါ</p>
+          </div>
+        </div>
+        <button onclick="closeCharacterReviewModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition-all cursor-pointer text-sm" title="Close">✕</button>
+      </div>
+
+      <!-- Character Switcher Tabs (Character 1 / Character 2) -->
+      <div class="flex items-center gap-2 bg-slate-950/80 p-1 rounded-xl border border-slate-800 shrink-0" id="charReviewTabsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="space-y-4 text-xs flex-1 overflow-y-auto pr-1.5 custom-scrollbar" id="charReviewModalBody">
+        <!-- Rendered dynamically via renderCharacterReviewContent() -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-3 shrink-0">
+        <button onclick="closeCharacterReviewModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 border border-slate-700 hover:bg-slate-800 mm-text cursor-pointer transition-all">
+          ✕ ပိတ်မည် (Close)
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="copyCharacterPromptFromReview()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/40 transition-all flex items-center gap-1.5 cursor-pointer mm-text">
+            <span>📋</span>
+            <span>Character Prompt ကူးမည်</span>
+          </button>
+          <button onclick="saveCharacterFromReview()" class="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-950/50 flex items-center gap-1.5 transition-all cursor-pointer mm-text hover:scale-105 active:scale-95">
+            <span>💾</span>
+            <span>အတည်ပြု သိမ်းဆည်းမည်</span>
+          </button>
+        </div>
       </div>
 
     </div>

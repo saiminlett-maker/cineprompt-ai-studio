@@ -657,9 +657,15 @@ function renderCharacterPreviewCards() {
           <label class="text-[10px] font-semibold text-emerald-300 mm-text flex items-center gap-1">
             <span>🎙️ သီးသန့် အသံ (Voice):</span>
           </label>
-          <button type="button" onclick="previewCharacterVoice('${escapeHtml(img.charName)}', '${escapeHtml(img.charRole)}', '${escapeHtml(currentVoice)}', 'Myanmar')" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow cursor-pointer mm-text">
-            <span>🔊 အသံနားထောင်</span>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="openCharacterReviewModal(${idx})" class="px-2 py-0.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold text-[10px] flex items-center gap-1 border border-indigo-500/40 transition-all cursor-pointer mm-text" title="ဇာတ်ကောင်၏ ရုပ်သွင်နှင့် အချက်အလက်များ အသေးစိတ် စစ်ဆေးရန်">
+              <span>🔍</span>
+              <span>Review</span>
+            </button>
+            <button type="button" onclick="previewCharacterVoice('${escapeHtml(img.charName)}', '${escapeHtml(img.charRole)}', '${escapeHtml(currentVoice)}', 'Myanmar')" class="px-2.5 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] flex items-center gap-1 transition-all shadow cursor-pointer mm-text">
+              <span>🔊 အသံနားထောင်</span>
+            </button>
+          </div>
         </div>
         <select onchange="updateCharField('${img.id}', 'charVoice', this.value)" class="w-full bg-[#111827] border border-emerald-600/50 rounded-lg px-2.5 py-1.5 text-xs text-emerald-200 focus:border-emerald-400 focus:outline-none mm-text cursor-pointer">
           ${voiceOptsHtml}
@@ -873,10 +879,16 @@ function updateCharacterVoicePreviewBoard() {
             </div>
           </div>
 
-          <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', document.getElementById('charVoiceSelect_${idx}') ? document.getElementById('charVoiceSelect_${idx}').value : '${escapeHtml(currentVoice)}', '${lang}')" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95" title="${escapeHtml(c.name)} ၏ သီးသန့် အသံကို စမ်းသပ်နားထောင်ရန်">
-            <span class="animate-pulse">🔊</span>
-            <span>Preview အသံ</span>
-          </button>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="openCharacterReviewModal(${idx})" class="px-2 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold text-[11px] flex items-center gap-1 border border-indigo-500/40 transition-all cursor-pointer mm-text shadow-sm hover:scale-105 active:scale-95" title="ဇာတ်ကောင်၏ ရုပ်သွင်နှင့် အချက်အလက်များ အသေးစိတ် စစ်ဆေးရန်">
+              <span>🔍</span>
+              <span>Review</span>
+            </button>
+            <button type="button" onclick="previewCharacterVoice('${escapeHtml(c.name)}', '${escapeHtml(c.role)}', document.getElementById('charVoiceSelect_${idx}') ? document.getElementById('charVoiceSelect_${idx}').value : '${escapeHtml(currentVoice)}', '${lang}')" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-md shadow-emerald-950/60 transition-all shrink-0 cursor-pointer mm-text hover:scale-105 active:scale-95" title="${escapeHtml(c.name)} ၏ သီးသန့် အသံကို စမ်းသပ်နားထောင်ရန်">
+              <span class="animate-pulse">🔊</span>
+              <span>Preview အသံ</span>
+            </button>
+          </div>
         </div>
 
         <!-- Gender Selection Toggle (Male / Female) -->
@@ -909,6 +921,311 @@ function updateCharacterVoicePreviewBoard() {
       </div>
     `;
   }).join('');
+}
+
+// ==========================================
+// 🎭 CHARACTER REVIEW & DOSSIER CONTROLLER
+// ==========================================
+
+state.currentReviewCharIndex = 0;
+
+function openCharacterReviewModal(charIndex = 0) {
+  state.currentReviewCharIndex = charIndex;
+  const modal = document.getElementById('characterReviewModal');
+  if (!modal) return;
+
+  renderCharacterReviewTabs();
+  renderCharacterReviewContent(charIndex);
+  modal.classList.remove('hidden');
+}
+
+function closeCharacterReviewModal() {
+  const modal = document.getElementById('characterReviewModal');
+  if (modal) modal.classList.add('hidden');
+  if (typeof stopVoiceAudio === 'function') stopVoiceAudio();
+}
+
+function switchReviewCharacterTab(charIndex) {
+  state.currentReviewCharIndex = charIndex;
+  renderCharacterReviewTabs();
+  renderCharacterReviewContent(charIndex);
+}
+
+function renderCharacterReviewTabs() {
+  const container = document.getElementById('charReviewTabsContainer');
+  if (!container) return;
+
+  const formParams = getFormValues();
+  const chars = formParams.characters || [];
+
+  container.innerHTML = chars.map((c, i) => {
+    const isActive = i === state.currentReviewCharIndex;
+    const activeClass = isActive 
+      ? 'bg-indigo-600 text-white font-bold shadow-md' 
+      : 'bg-transparent text-slate-400 hover:text-slate-200';
+    return `
+      <button type="button" onclick="switchReviewCharacterTab(${i})" class="flex-1 py-1.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5 mm-text cursor-pointer ${activeClass}">
+        <span>${i === 0 ? '👤 ဇာတ်ကောင် ၁' : '👥 ဇာတ်ကောင် ၂'}:</span>
+        <span class="truncate max-w-[120px] font-bold">${escapeHtml(c.name)}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function renderCharacterReviewContent(charIndex) {
+  const body = document.getElementById('charReviewModalBody');
+  if (!body) return;
+
+  const formParams = getFormValues();
+  const chars = formParams.characters || [];
+  const c = chars[charIndex] || chars[0] || { name: 'မင်းခန့်', role: 'အဓိက ဇာတ်ဆောင်', voice: 'Male Movie Narrator', gender: 'male' };
+
+  const currentGender = c.gender || (charIndex === 0 ? 'male' : 'female');
+  const currentVoice = c.voice || (currentGender === 'female' ? "Female Sweet Storyteller" : "Male Movie Narrator");
+  const avatarVisual = c.dataUrl 
+    ? `<img src="${c.dataUrl}" alt="${escapeHtml(c.name)}" class="w-24 h-24 object-cover rounded-2xl border-2 border-indigo-500 shadow-xl mx-auto">`
+    : `<div class="w-24 h-24 rounded-2xl ${currentGender === 'female' ? 'bg-pink-950/80 border-pink-600' : 'bg-indigo-950/80 border-indigo-600'} border-2 flex items-center justify-center text-5xl shadow-xl mx-auto">${currentGender === 'female' ? '👩' : '👨'}</div>`;
+
+  const voiceOptionsHtml = availableVoiceOptions.map(vo => `
+    <option value="${vo.value}" ${(currentVoice.includes(vo.value.split('(')[0].trim()) || currentVoice === vo.value) ? 'selected' : ''}>${vo.label}</option>
+  `).join('');
+
+  // Auto-generate AI Image & Video Consistency Prompt for this character
+  const charPromptBlueprint = `Cinematic 8k character portrait of ${c.name}, ${currentGender === 'female' ? 'female' : 'male'} character, ${c.appearance || 'sharp facial features, expressive eyes'}, wearing ${c.costume || 'tailored iconic costume'}, ${formParams.artStyle} aesthetic, ultra-detailed skin textures, volumetric studio lighting, dynamic camera angle, photorealistic consistency seed, master composition --ar 16:9 --v 6.0`;
+
+  // Auto-generate character sample speech test line
+  let sampleSpeechLine = `မင်္ဂလာပါ! ကျွန်တော်ကတော့ ${c.name} ဖြစ်ပါတယ်။ ဒီဇာတ်လမ်းထဲမှာ ${c.role || 'ဇာတ်ကောင်'} အဖြစ် ပါဝင်သရုပ်ဆောင်ထားပါတယ်ခင်ဗျာ။`;
+  if (currentGender === 'female') {
+    sampleSpeechLine = `မင်္ဂလာပါရှင်! ကျွန်မကတော့ ${c.name} ဖြစ်ပါတယ်။ ဒီဇာတ်လမ်းထဲမှာ ${c.role || 'ဇာတ်ကောင်'} အဖြစ် ပါဝင်သရုပ်ဆောင်ထားပါတယ်ရှင့်။`;
+  }
+
+  body.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      
+      <!-- Left Column: Visual Portrait & Identity (5 cols) -->
+      <div class="md:col-span-5 bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-4 space-y-3.5 shadow-lg flex flex-col justify-between">
+        
+        <!-- Portrait & Badges -->
+        <div class="text-center space-y-2">
+          ${avatarVisual}
+          <div>
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full ${charIndex === 0 ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' : 'bg-purple-950 text-purple-300 border border-purple-800'} font-mono font-bold">
+              ${charIndex === 0 ? 'Main Lead Character #1' : 'Supporting / Sidekick #2'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Identity Inputs -->
+        <div class="space-y-2.5">
+          <!-- Name -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-indigo-300 mm-text flex items-center gap-1">
+              <span>🏷️ ဇာတ်ကောင် အမည် (Character Name):</span>
+            </label>
+            <input type="text" id="reviewCharNameInput" value="${escapeHtml(c.name)}" class="w-full bg-[#1e293b] border border-indigo-500/60 rounded-xl px-3 py-1.5 text-xs text-white font-bold focus:border-emerald-400 focus:outline-none mm-text">
+          </div>
+
+          <!-- Gender -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">⚧️ Gender (ကျား/မ):</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="setReviewCharGender('male')" id="reviewGenderMaleBtn" class="py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${currentGender === 'male' ? 'bg-indigo-600 text-white shadow-md border border-indigo-400' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+                <span>👨 Male (ကျား)</span>
+              </button>
+              <button type="button" onclick="setReviewCharGender('female')" id="reviewGenderFemaleBtn" class="py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${currentGender === 'female' ? 'bg-pink-600 text-white shadow-md border border-pink-400' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+                <span>👩 Female (မ)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Role -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">🎭 အခန်းကဏ္ဍ (Role):</label>
+            <input type="text" id="reviewCharRoleInput" value="${escapeHtml(c.role || '')}" placeholder="ဥပမာ- ရဲရင့်သော စုံထောက်" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:border-emerald-400 focus:outline-none mm-text">
+          </div>
+
+          <!-- Appearance -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">👤 ရုပ်သွင်ပြင် (Appearance):</label>
+            <textarea id="reviewCharAppInput" rows="2" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:border-emerald-400 focus:outline-none mm-text custom-scrollbar resize-none">${escapeHtml(c.appearance || '')}</textarea>
+          </div>
+
+          <!-- Costume -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">👕 ဝတ်စုံ (Costume):</label>
+            <input type="text" id="reviewCharCosInput" value="${escapeHtml(c.costume || '')}" placeholder="ဝတ်စုံ ဖော်ပြချက်..." class="w-full bg-[#1e293b] border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:border-emerald-400 focus:outline-none mm-text">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Voice Audition, Dialogue Test & AI Prompt Blueprint (7 cols) -->
+      <div class="md:col-span-7 space-y-3 flex flex-col justify-between">
+        
+        <!-- Voice Persona & Interactive Dialogue Audition -->
+        <div class="bg-slate-900/90 border border-emerald-500/40 rounded-2xl p-4 space-y-3 shadow-lg">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🎙️</span>
+              <span class="text-xs font-bold text-emerald-300 mm-text">Voice Persona & Speech Audition (အသံစမ်းသပ်မှု)</span>
+            </div>
+            <span class="text-[10px] text-emerald-400 font-mono">Real-time Synthesizer</span>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">သတ်မှတ်ထားသော အသံ (Voice):</label>
+            <select id="reviewCharVoiceSelect" class="w-full bg-[#111827] border border-emerald-600/60 rounded-xl px-3 py-2 text-xs text-emerald-100 font-medium focus:border-emerald-400 focus:outline-none mm-text cursor-pointer">
+              ${voiceOptionsHtml}
+            </select>
+          </div>
+
+          <!-- Custom Test Line -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 mm-text">စမ်းသပ်ပြောခိုင်းမည့် စာသား (Test Speech Line):</label>
+            <div class="relative">
+              <textarea id="reviewSpeechTestInput" rows="2" class="w-full bg-[#1e293b] border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 focus:border-emerald-400 focus:outline-none mm-text custom-scrollbar resize-none">${escapeHtml(sampleSpeechLine)}</textarea>
+            </div>
+          </div>
+
+          <!-- Audition Controls -->
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <span class="text-[10px] text-slate-400 mm-text">အသံသွင်းဟန်နှင့် လေယူလေသိမ်းအား စမ်းသပ်ရန်:</span>
+            <button type="button" onclick="playReviewCustomSpeech()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-950/60 transition-all cursor-pointer mm-text hover:scale-105 active:scale-95">
+              <span class="animate-pulse">🔊</span>
+              <span>စကားပြော စမ်းသပ်နားထောင်မည်</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Visual Consistency Prompt Blueprint -->
+        <div class="bg-slate-900/90 border border-indigo-500/40 rounded-2xl p-4 space-y-2.5 shadow-lg flex-1 flex flex-col justify-between">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base">🧬</span>
+              <span class="text-xs font-bold text-indigo-200 mm-text">AI Image & Video Prompt Blueprint</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 font-mono">Consistency Seed</span>
+          </div>
+
+          <div class="space-y-1 flex-1">
+            <p class="text-[10px] text-slate-400 mm-text">Midjourney, Sora, FLUX, Kling တို့တွင် ဤဇာတ်ကောင် ရုပ်သွင်ကို ထပ်တူထွက်စေရန် သုံးနိုင်သော Prompt:</p>
+            <textarea id="reviewCharPromptBlueprint" readonly rows="3" class="w-full bg-[#0b0f19] border border-indigo-950 rounded-xl p-2.5 text-[11px] font-mono text-emerald-300 focus:outline-none custom-scrollbar resize-none">${escapeHtml(charPromptBlueprint)}</textarea>
+          </div>
+
+          <div class="flex items-center justify-between pt-1 text-[10px] text-slate-400">
+            <span>Negative tags: deformed, bad anatomy, blurry, duplicate</span>
+            <span class="text-indigo-400 font-mono">Ready to render</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+function setReviewCharGender(newGender) {
+  const maleBtn = document.getElementById('reviewGenderMaleBtn');
+  const femaleBtn = document.getElementById('reviewGenderFemaleBtn');
+  const voiceSel = document.getElementById('reviewCharVoiceSelect');
+
+  if (newGender === 'male') {
+    if (maleBtn) maleBtn.className = 'py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer bg-indigo-600 text-white shadow-md border border-indigo-400';
+    if (femaleBtn) femaleBtn.className = 'py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer bg-slate-800 text-slate-400 border border-slate-700';
+    if (voiceSel && (!voiceSel.value || voiceSel.value.includes('Female'))) {
+      voiceSel.value = "Male Movie Narrator (ယောက်ျားလေး - ရုပ်ရှင်ဆန်ဆန် ဩဇာတိက္ကမရှိသော ဇာတ်ကြောင်းပြောသံ)";
+    }
+  } else {
+    if (femaleBtn) femaleBtn.className = 'py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer bg-pink-600 text-white shadow-md border border-pink-400';
+    if (maleBtn) maleBtn.className = 'py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer bg-slate-800 text-slate-400 border border-slate-700';
+    if (voiceSel && (!voiceSel.value || voiceSel.value.includes('Male'))) {
+      voiceSel.value = "Female Sweet Storyteller (မိန်းကလေး - ချိုသာနွေးထွေးသော ပုံပြင်ပြောသံ)";
+    }
+  }
+}
+
+function playReviewCustomSpeech() {
+  const testInput = document.getElementById('reviewSpeechTestInput');
+  const voiceSel = document.getElementById('reviewCharVoiceSelect');
+  const nameInput = document.getElementById('reviewCharNameInput');
+
+  const text = testInput ? testInput.value.trim() : 'မင်္ဂလာပါ!';
+  const voice = voiceSel ? voiceSel.value : 'Male Movie Narrator';
+  const name = nameInput ? nameInput.value.trim() : 'ဇာတ်ကောင်';
+
+  playVoiceAudio(text, text, voice, 'Myanmar', `Review: ${name}`);
+  showToast(`🔊 "${name}" ၏ အသံဖြင့် စကားပြောစမ်းသပ်နေပါသည်...`);
+}
+
+function saveCharacterFromReview() {
+  const idx = state.currentReviewCharIndex;
+  const name = document.getElementById('reviewCharNameInput') ? document.getElementById('reviewCharNameInput').value.trim() : '';
+  const role = document.getElementById('reviewCharRoleInput') ? document.getElementById('reviewCharRoleInput').value.trim() : '';
+  const appearance = document.getElementById('reviewCharAppInput') ? document.getElementById('reviewCharAppInput').value.trim() : '';
+  const costume = document.getElementById('reviewCharCosInput') ? document.getElementById('reviewCharCosInput').value.trim() : '';
+  const voice = document.getElementById('reviewCharVoiceSelect') ? document.getElementById('reviewCharVoiceSelect').value : '';
+  
+  const maleBtn = document.getElementById('reviewGenderMaleBtn');
+  const isMale = maleBtn ? maleBtn.classList.contains('bg-indigo-600') : true;
+  const gender = isMale ? 'male' : 'female';
+
+  if (state.uploadedImages && state.uploadedImages.length > idx) {
+    if (name) state.uploadedImages[idx].charName = name;
+    if (role) state.uploadedImages[idx].charRole = role;
+    if (appearance) state.uploadedImages[idx].charAppearance = appearance;
+    if (costume) state.uploadedImages[idx].charCostume = costume;
+    if (voice) state.uploadedImages[idx].charVoice = voice;
+    state.uploadedImages[idx].charGender = gender;
+  }
+
+  if (idx === 0) {
+    if (name) {
+      state.character1CustomName = name;
+      const c1El = document.getElementById('customCharName');
+      if (c1El) c1El.value = name;
+    }
+    if (role) {
+      const r1El = document.getElementById('customCharRole');
+      if (r1El) r1El.value = role;
+    }
+    if (appearance) {
+      const a1El = document.getElementById('customCharAppearance');
+      if (a1El) a1El.value = appearance;
+    }
+    if (costume) {
+      const cos1El = document.getElementById('customCharCostume');
+      if (cos1El) cos1El.value = costume;
+    }
+    if (voice) {
+      state.character1Voice = voice;
+      const vMain = document.getElementById('voiceOverPersona');
+      if (vMain) vMain.value = voice;
+    }
+    state.character1Gender = gender;
+  } else if (idx === 1) {
+    if (name) state.character2CustomName = name;
+    if (voice) state.character2Voice = voice;
+    state.character2Gender = gender;
+  }
+
+  renderCharacterPreviewCards();
+  syncCharacterChangesAcrossUI();
+  saveCharacterProfileToStorage();
+
+  showToast(`✅ "${name || `ဇာတ်ကောင် #${idx+1}`}" ၏ Review ပြင်ဆင်ချက်များကို အောင်မြင်စွာ သိမ်းဆည်းအတည်ပြုပြီးပါပြီ!`);
+  closeCharacterReviewModal();
+}
+
+function copyCharacterPromptFromReview() {
+  const promptEl = document.getElementById('reviewCharPromptBlueprint');
+  if (!promptEl || !promptEl.value) return;
+
+  navigator.clipboard.writeText(promptEl.value).then(() => {
+    showToast("📋 Character Visual Consistency Prompt ကို Copy ကူးယူပြီးပါပြီ!");
+  }).catch(() => {
+    promptEl.select();
+    document.execCommand('copy');
+    showToast("📋 Character Prompt ကို Copy ကူးယူပြီးပါပြီ!");
+  });
 }
 
 function previewCharacterVoice(charName, charRole, voicePersona, lang = 'Myanmar') {
